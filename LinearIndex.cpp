@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 
+
 LinearIndex::~LinearIndex() {
 
 }
@@ -110,20 +111,72 @@ void LinearIndex::print(){
 bool LinearIndex::writeToFile(string fileName){
 	ofstream os(fileName);
 	for(int i = 0; i < documentTitles.size(); i++){
-		os << documentTitles.at(i).first << " <> "  << documentTitles.at(i).second << endl;
+		os << documentTitles.at(i).first << " <1> "  << documentTitles.at(i).second << endl;
 	}
-	os << "<-1>" << endl;
+	os << "<2>" << endl;
 	for (unordered_map<string, vector< pair<int, int> > >::iterator it = index.begin(); it != index.end(); ++it){
 		os << it->first;
 		for(int i = 0; i < it->second.size(); i++){
 			os << " " << it->second.at(i).first << " " << it->second.at(i).second;
 		}
-		os << " <>\n";
+		os << " <3>\n";
 	}
+
+	os << "<4>";
 	os.close();
 	return true;
 }
 
 bool LinearIndex::readFromFile(string fileName){
+	ifstream is(fileName);
+	string token;
+	string name = "";
+
+	while(is.is_open()){
+		is >> token;
+
+		if(token != "<1>"){
+			name += token;
+		} else {
+			string num;
+			is >> num;
+			pair<string, int> item;
+			item.first = name;
+			item.second = atoi(num.c_str());
+			documentTitles.push_back(item);
+			name = "";
+		}
+
+		if(token == "<2>") break;
+	}
+
+	name = "";
+	vector<int> nums;
+	while(is.is_open()){
+		nums.clear();
+		is >> name;
+		if(name == "<4>") break;
+		while(true){
+			string num;
+			is >> num;
+			if(num == "<3>"){
+				break;
+			} else {
+				nums.push_back(atoi(num.c_str()));
+			}
+		}
+		pair<string, vector< pair<int, int> > > newItem;
+		newItem.first = name;
+
+		for(int i = 0; i < nums.size(); i+=2){
+			cout << name << nums.at(i) << nums.at(i+1) << endl;
+			pair<int, int> numPair;
+			numPair.first = nums.at(i);
+			numPair.second = nums.at(i+1);
+			newItem.second.push_back(numPair);
+		}
+
+		index.insert(newItem);
+	}
 	return true;
 }

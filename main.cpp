@@ -8,7 +8,9 @@ using namespace std;
 int main()
 {
    LinearIndex ind;
-   vector<string> words;
+   
+
+   /*vector<string> words;
 
    words.push_back("Hello");
    words.push_back("World");
@@ -34,9 +36,12 @@ int main()
 
    ind.addDocument("Document 3", words);
 
+   ind.print();*/
+   ind.readFromFile("read.txt");
    ind.print();
 
-   words.clear();
+
+   /*words.clear();
 
    words.push_back("Hello");
 
@@ -47,7 +52,7 @@ int main()
    vector<string> outputFromSearch = ind.getDocumentsForQuery(words, notAllowed);
 
    for(int i = 0; i < outputFromSearch.size(); i++)
-   		cout << outputFromSearch.at(i) << endl;
+   		cout << outputFromSearch.at(i) << endl;*/
 
    	ind.writeToFile("index.txt");
 }
