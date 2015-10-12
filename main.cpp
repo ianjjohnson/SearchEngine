@@ -48,6 +48,8 @@ int main()
 
    for(int i = 0; i < outputFromSearch.size(); i++)
    		cout << outputFromSearch.at(i) << endl;
+
+   	ind.writeToFile("index.txt");
 }
 
 /*---------------------------------------------

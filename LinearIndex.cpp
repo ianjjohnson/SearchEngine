@@ -1,5 +1,6 @@
 #include "LinearIndex.h"
 #include <iostream>
+#include <fstream>
 
 LinearIndex::~LinearIndex() {
 
@@ -107,6 +108,19 @@ void LinearIndex::print(){
 
 
 bool LinearIndex::writeToFile(string fileName){
+	ofstream os(fileName);
+	for(int i = 0; i < documentTitles.size(); i++){
+		os << documentTitles.at(i).first << " <> "  << documentTitles.at(i).second << endl;
+	}
+	os << "<-1>" << endl;
+	for (unordered_map<string, vector< pair<int, int> > >::iterator it = index.begin(); it != index.end(); ++it){
+		os << it->first;
+		for(int i = 0; i < it->second.size(); i++){
+			os << " " << it->second.at(i).first << " " << it->second.at(i).second;
+		}
+		os << " <>\n";
+	}
+	os.close();
 	return true;
 }
 
