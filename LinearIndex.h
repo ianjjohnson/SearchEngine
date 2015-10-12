@@ -22,7 +22,7 @@ public:
 	void print();
 
 private:
-	vector<string> documentTitles;
+	vector< pair<string, int> > documentTitles;
 	unordered_map<string, vector< pair<int, int> > > index;
 	
 };

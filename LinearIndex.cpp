@@ -8,11 +8,13 @@ LinearIndex::~LinearIndex() {
 bool LinearIndex::addDocument(string name, vector<string> relevantWords){
 	int indexOfNewDoc = documentTitles.size();
 
+
 	pair<string, int> doc;
 	doc.first = name;
 	doc.second = relevantWords.size();
 
-	documentTitles.push_back(name);
+	//Add document title to list of titles
+	documentTitles.push_back(doc);
 
 	for(int i = 0; i < relevantWords.size(); i++){
 
@@ -22,6 +24,7 @@ bool LinearIndex::addDocument(string name, vector<string> relevantWords){
 
 		unordered_map< string, vector< pair<int,int> > >::iterator item = index.find(word);
 
+		//If this word hasn't been indexed yet
 		if(item == index.end()){
 
 			vector< pair<int, int > > nums;
@@ -32,17 +35,19 @@ bool LinearIndex::addDocument(string name, vector<string> relevantWords){
 			pair< string, vector< pair<int, int> > > newItem (word, nums);
 			index.insert(newItem);
 
-		} else {
+		} 
+		//If this word has already been indexed
+		else {
 
 			pair <int, int> defaultEntry;
 			defaultEntry.first = indexOfNewDoc;
 			defaultEntry.second = count(relevantWords.begin(), relevantWords.end(), word);
 			item->second.push_back(defaultEntry);
-
-
-			for(int j = 0; j < relevantWords.size(); j++)
-				if(relevantWords.at(j) == word) relevantWords.at(j) = "@@@";
 		}
+
+		//Mark all duplicate words so they're not added again
+		for(int j = 0; j < relevantWords.size(); j++)
+			if(relevantWords.at(j) == word) relevantWords.at(j) = "@@@";
 
 	}
 
@@ -81,7 +86,7 @@ vector<string> LinearIndex::getDocumentsForQuery(vector<string> inDoc, vector<st
 
 	for(int i = 0; i < docs.size(); i++){
 		if(docs.at(i).first != -1)
-			titles.push_back(documentTitles.at(docs.at(i).first));
+			titles.push_back(documentTitles.at(docs.at(i).first).first);
 	}
 
 
@@ -95,7 +100,7 @@ void LinearIndex::print(){
   		vector< pair<int, int> > nums = it->second;
   		cout << it->first << ": ";
   		for(int i = 0; i < nums.size(); i++)
-  			cout << documentTitles.at(nums.at(i).first) << ", " << nums.at(i).second << "\t";
+  			cout << documentTitles.at(nums.at(i).first).first << ", " << nums.at(i).second << "\t";
   		cout << endl;
 	}
 }
