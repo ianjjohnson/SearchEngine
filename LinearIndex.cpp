@@ -32,7 +32,7 @@ bool LinearIndex::addDocument(string name, vector<string> relevantWords){
 			vector< pair<int, int > > nums;
 			pair <int, int> defaultEntry;
 			defaultEntry.first = indexOfNewDoc;
-			defaultEntry.second = 1;
+			defaultEntry.second = count(relevantWords.begin(), relevantWords.end(), word);
 			nums.push_back(defaultEntry);
 			pair< string, vector< pair<int, int> > > newItem (word, nums);
 			index.insert(newItem);
