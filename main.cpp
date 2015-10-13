@@ -13,9 +13,9 @@ int main(int argc, char* argv[])
    parser.skipIntroPage();
 
    for(int i = 0; i < 57; i++)
-   		parser.writeDocToIndex(&ind);*/
+   		parser.writeDocToIndex(&ind);
 
-   vector<string> words;
+   vector<string> words;*/
 
    /*words.push_back("Hello");
    words.push_back("World");

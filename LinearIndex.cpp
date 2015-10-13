@@ -11,7 +11,6 @@ LinearIndex::~LinearIndex() {
 bool LinearIndex::addDocument(string name, vector<string> relevantWords){
 	int indexOfNewDoc = documentTitles.size();
 
-
 	pair<string, int> doc;
 	doc.first = name;
 	doc.second = relevantWords.size();
