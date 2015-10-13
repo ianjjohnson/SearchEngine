@@ -1,3 +1,6 @@
+#ifndef INDEX_INTERFACE_H
+#define INDEX_INTERFACE_H
+
 #include <string>
 #include <vector>
 
@@ -19,3 +22,5 @@ private:
 	vector<pair<string, int> > documentTitles;
 
 };
+
+#endif

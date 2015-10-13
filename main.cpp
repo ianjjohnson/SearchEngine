@@ -1,5 +1,6 @@
 #include <iostream>
 #include "LinearIndex.h"
+#include "XMLParser.h"
 
 using namespace std;
 
@@ -8,7 +9,11 @@ using namespace std;
 int main()
 {
    LinearIndex ind;
-   
+   /*XMLParser parser("Input.xml");
+   parser.skipIntroPage();
+
+   for(int i = 0; i < 3; i++)
+   		parser.writeDocToIndex(&ind);*/
 
    /*vector<string> words;
 
