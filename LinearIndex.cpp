@@ -1,4 +1,5 @@
 #include "LinearIndex.h"
+#include "porter2_stemmer.h"
 #include <iostream>
 #include <fstream>
 
@@ -59,6 +60,14 @@ bool LinearIndex::addDocument(string name, vector<string> relevantWords){
 vector<string> LinearIndex::getDocumentsForQuery(vector<string> inDoc, vector<string> notInDoc){
 	
 	vector< pair <int, int> > docs;
+
+	for(int i = 0; i < inDoc.size(); i++){
+		Porter2Stemmer::stem(inDoc.at(i));
+	}
+
+	for(int i = 0; i < notInDoc.size(); i++){
+		Porter2Stemmer::stem(notInDoc.at(i));
+	}
 
 	for (unordered_map<string, vector< pair<int, int> > >::iterator it = index.begin(); it != index.end(); ++it){
 
@@ -136,7 +145,7 @@ bool LinearIndex::readFromFile(string fileName){
 		is >> token;
 
 		if(token != "<1>"){
-			name += token;
+			name += " " + token;
 		} else {
 			string num;
 			is >> num;

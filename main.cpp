@@ -9,11 +9,11 @@ using namespace std;
 int main()
 {
    LinearIndex ind;
-   XMLParser parser("Input.xml");
+   /*XMLParser parser("Input.xml");
    parser.skipIntroPage();
 
-   for(int i = 0; i < 5; i++)
-   		parser.writeDocToIndex(&ind);
+   for(int i = 0; i < 57; i++)
+   		parser.writeDocToIndex(&ind);*/
 
    vector<string> words;
 
@@ -42,7 +42,7 @@ int main()
    ind.addDocument("Document 3", words);
 
    ind.print();*/
-   //ind.readFromFile("read.txt");
+   ind.readFromFile("read.txt");
    ind.print();
 
 
