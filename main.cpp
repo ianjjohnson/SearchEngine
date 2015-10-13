@@ -48,27 +48,20 @@ int main(int argc, char* argv[])
    vector<string> allow;
    vector<string> disallow;
 
+   bool both = false;
+
    for(int i = 1; i < argc; i++){
-   		if(string(argv[i]) == "OR"){
-   			string ortoken(argv[i+1]);
-   			ortoken += "|" + string(argv[i+2]);
-   			i+=2;
-   			allow.push_back(ortoken);
-   		} else if(string(argv[i]) == "AND"){
-   			string andtoken(argv[i+1]);
-   			andtoken += "&" + string(argv[i+2]);
-   			i+=2;
-   			allow.push_back(andtoken);
-   		} else if(string(argv[i]) == "NOT"){
-   			string nottoken(argv[i+1]);
-   			disallow.push_back(nottoken);
+   		if(string(argv[i]) == "OR") both = false;
+   		else if(string(argv[i]) == "AND") both = true;
+   		else if(string(argv[i]) == "NOT"){
+   			disallow.push_back(string(argv[i+1]));
    			i++;
    		} else {
    			allow.push_back(string(argv[i]));
    		}
    }
 
-   vector<string> outputFromSearch = ind.getDocumentsForQuery(allow, disallow);
+   vector<string> outputFromSearch = ind.getDocumentsForQuery(allow, disallow, both);
 
    for(int i = 0; i < outputFromSearch.size(); i++)
    		cout << outputFromSearch.at(i) << endl;

@@ -13,7 +13,7 @@ public:
 
 	virtual bool addDocument(string name, vector<string> relevantWords);
 
-	virtual vector<string> getDocumentsForQuery(vector<string> inDoc, vector<string> notInDoc);
+	virtual vector<string> getDocumentsForQuery(vector<string> inDoc, vector<string> notInDoc, bool both);
 
 
 	virtual bool writeToFile(string);

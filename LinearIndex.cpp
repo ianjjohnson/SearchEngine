@@ -57,7 +57,7 @@ bool LinearIndex::addDocument(string name, vector<string> relevantWords){
 	return true;
 }
 
-vector<string> LinearIndex::getDocumentsForQuery(vector<string> inDoc, vector<string> notInDoc){
+vector<string> LinearIndex::getDocumentsForQuery(vector<string> inDoc, vector<string> notInDoc, bool both){
 	
 	vector< pair <int, int> > docs;
 
@@ -76,13 +76,31 @@ vector<string> LinearIndex::getDocumentsForQuery(vector<string> inDoc, vector<st
 	for (unordered_map<string, vector< pair<int, int> > >::iterator it = index.begin(); it != index.end(); ++it){
 
 		for(int i = 0; i < inDoc.size(); i++){
-			if(it->first == inDoc.at(i))
-				for(int j = 0; j < it->second.size(); j++)
-					docs.push_back(it->second.at(j));
+			if(it->first == inDoc.at(i)){
+				for(int j = 0; j < it->second.size(); j++){
+					bool add = false;
+					if(both){
+						unordered_map<string, vector< pair<int, int> > >::iterator other = index.find(inDoc.at(i+1));
+						if(other != index.end()){
+							for(int k = 0; k < other->second.size(); k++){
+								if(other->second.at(k).first == it->second.at(j).first){
+									add = true;
+									break;
+								}
+							}
+						}
+					} else add = true;
+					if(add)
+						docs.push_back(it->second.at(j));
+				}
+			}
+			if(both) i++;
 		}
 
 		//Sort by relevance and remove duplicates
 	}
+
+
 
 	for(int i = 0; i < notInDoc.size(); i++){
 		unordered_map<string, vector< pair<int, int> > >::iterator item = index.find(notInDoc.at(i));
@@ -182,7 +200,6 @@ bool LinearIndex::readFromFile(string fileName){
 		newItem.first = name;
 
 		for(int i = 0; i < nums.size(); i+=2){
-			cout << name << nums.at(i) << nums.at(i+1) << endl;
 			pair<int, int> numPair;
 			numPair.first = nums.at(i);
 			numPair.second = nums.at(i+1);
