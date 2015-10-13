@@ -15,9 +15,9 @@ int main()
    for(int i = 0; i < 5; i++)
    		parser.writeDocToIndex(&ind);
 
-   /*vector<string> words;
+   vector<string> words;
 
-   words.push_back("Hello");
+   /*words.push_back("Hello");
    words.push_back("World");
    words.push_back("Data");
 
@@ -46,18 +46,18 @@ int main()
    ind.print();
 
 
-   /*words.clear();
+   words.clear();
 
-   words.push_back("Hello");
+   words.push_back("chemistry");
 
    vector<string> notAllowed;
 
-   notAllowed.push_back("World");
+   notAllowed.push_back("covalent");
 
    vector<string> outputFromSearch = ind.getDocumentsForQuery(words, notAllowed);
 
    for(int i = 0; i < outputFromSearch.size(); i++)
-   		cout << outputFromSearch.at(i) << endl;*/
+   		cout << outputFromSearch.at(i) << endl;
 
    	ind.writeToFile("index.txt");
 }
