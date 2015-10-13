@@ -6,7 +6,7 @@ using namespace std;
 
 //AVLTreeNode *createNewNode(int key);
 
-int main()
+int main(int argc, char* argv[])
 {
    LinearIndex ind;
    /*XMLParser parser("Input.xml");
@@ -43,18 +43,32 @@ int main()
 
    ind.print();*/
    ind.readFromFile("read.txt");
-   ind.print();
+   //ind.print();
 
+   vector<string> allow;
+   vector<string> disallow;
 
-   words.clear();
+   for(int i = 1; i < argc; i++){
+   		if(string(argv[i]) == "OR"){
+   			string ortoken(argv[i+1]);
+   			ortoken += "|" + string(argv[i+2]);
+   			i+=2;
+   			allow.push_back(ortoken);
+   		} else if(string(argv[i]) == "AND"){
+   			string andtoken(argv[i+1]);
+   			andtoken += "&" + string(argv[i+2]);
+   			i+=2;
+   			allow.push_back(andtoken);
+   		} else if(string(argv[i]) == "NOT"){
+   			string nottoken(argv[i+1]);
+   			disallow.push_back(nottoken);
+   			i++;
+   		} else {
+   			allow.push_back(string(argv[i]));
+   		}
+   }
 
-   words.push_back("chemistry");
-
-   vector<string> notAllowed;
-
-   notAllowed.push_back("covalent");
-
-   vector<string> outputFromSearch = ind.getDocumentsForQuery(words, notAllowed);
+   vector<string> outputFromSearch = ind.getDocumentsForQuery(allow, disallow);
 
    for(int i = 0; i < outputFromSearch.size(); i++)
    		cout << outputFromSearch.at(i) << endl;
