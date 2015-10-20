@@ -2,7 +2,7 @@
 #include "porter2_stemmer.h"
 #include <iostream>
 #include <fstream>
-
+#include <algorithm>
 
 LinearIndex::~LinearIndex() {
 

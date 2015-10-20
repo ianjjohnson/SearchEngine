@@ -11,6 +11,7 @@ public:
 	XMLParser(string);
 	bool writeDocToIndex(IndexInterface*);
 	bool skipIntroPage();
+	bool readFile(IndexInterface*);
 private:
 	ifstream is;
 	vector<string> stopWords;

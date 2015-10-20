@@ -31,6 +31,8 @@ bool XMLParser::isStopWord(string token){
 XMLParser::XMLParser(string fileName){
 	is.open(fileName);
 
+	cout << "File opened!\n";
+
 	ifstream getStopWords("stopwords.txt");
 	string token = "";
 
@@ -44,6 +46,17 @@ XMLParser::XMLParser(string fileName){
 
 }
 
+bool XMLParser::readFile(IndexInterface* index){
+	skipIntroPage();
+	int num = 0;
+	while(!is.eof()){
+		num++;
+		cout << num << endl;
+		writeDocToIndex(index);
+	}
+	return true;
+}
+
 bool XMLParser::skipIntroPage(){
 
 	string token = "";
@@ -55,7 +68,10 @@ bool XMLParser::skipIntroPage(){
 bool XMLParser::writeDocToIndex(IndexInterface* index){
 
 	string token = "";
-	while(token != "<page>") is >> token;
+	while(token != "<page>" && !is.eof()) is >> token;
+	
+	if(is.eof()) return false;
+
 	is >> token;
 
 	string docName;
@@ -78,7 +94,7 @@ bool XMLParser::writeDocToIndex(IndexInterface* index){
 		is >> token;
 	}
 
-	index->addDocument(docName,words);
+	index->addDocument(docName, words);
 
 	return true;
 }
