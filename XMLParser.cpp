@@ -85,7 +85,6 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
    cout << "found root node\n";
 
 
-   vector<string> words;
    int num = 0;
    for (rapidxml::xml_node<> * document_node = root_node->first_node("page"); document_node; document_node = document_node->next_sibling()){
       rapidxml::xml_node<> * text;
@@ -94,8 +93,8 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
       
       if(docName.substr(0, 4) == "User" || docName.substr(0,4) == "File") continue;
 
+      int indexOfDoc = index->addDocument(docName);
 
-      words.clear();
       if(text){
          stringstream ss(text->value());
          
@@ -103,14 +102,12 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
          	string word;
          	ss >> word;
             if(!isStopWord(word) && isNotXMLTag(word)){
-            	for(int i = 0; i < word.size(); i++)
-					word[i] = tolower(word[i]);
+				word[0] = tolower(word[0]);
             	Porter2Stemmer::stem(word);
-            	words.push_back(word);
+            	index->addWordForDocument(indexOfDoc, word);
             }
          }
 
-         index->addDocument(docName, words);
 
          cout << num++ << docName << endl;
          
@@ -144,10 +141,10 @@ bool XMLParser::writeDocToIndex(IndexInterface* index){
 	while(token != "</page>"){
 		for(int i = 0; i < token.size(); i++)
 			token[i] = tolower(token[i]);
-		if(isNotXMLTag(token) && !isStopWord(token)){
-			Porter2Stemmer::stem(token);
-			words.push_back(token);
-		}
+		//if(isNotXMLTag(token) && !isStopWord(token)){
+		Porter2Stemmer::stem(token);
+		words.push_back(token);
+		//}
 		is >> token;
 	}
 

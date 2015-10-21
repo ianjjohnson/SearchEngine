@@ -12,6 +12,8 @@ public:
 	virtual ~LinearIndex();
 
 	virtual bool addDocument(string name, vector<string> relevantWords);
+	virtual int addDocument(string name);
+	virtual bool addWordForDocument(int documentIndex, string word);
 
 	virtual vector<string> getDocumentsForQuery(vector<string> inDoc, vector<string> notInDoc, bool both);
 
@@ -23,7 +25,7 @@ public:
 
 private:
 	vector< pair<string, int> > documentTitles;
-	unordered_map<string, vector< pair<int, int> > > index;
+	unordered_map<string, vector<int> > index;
 	
 };
 

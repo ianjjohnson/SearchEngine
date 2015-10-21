@@ -8,8 +8,8 @@ LinearIndex::~LinearIndex() {
 
 }
 
-bool LinearIndex::addDocument(string name, vector<string> relevantWords){
-	int indexOfNewDoc = documentTitles.size();
+bool LinearIndex::addDocument(string name, vector<string> relevantWords){return true;}
+	/*int indexOfNewDoc = documentTitles.size();
 
 	pair<string, int> doc;
 	doc.first = name;
@@ -54,11 +54,43 @@ bool LinearIndex::addDocument(string name, vector<string> relevantWords){
 	}
 
 	return true;
+}*/
+
+int LinearIndex::addDocument(string name){
+	int indexOfNewDoc = documentTitles.size();
+
+	pair<string, int> doc;
+	doc.first = name;
+	doc.second = 1;
+
+	//Add document title to list of titles
+	documentTitles.push_back(doc);
+
+	return documentTitles.size()-1;
+}
+
+bool LinearIndex::addWordForDocument(int documentIndex, string word){
+		unordered_map< string, vector< int > >::iterator item = index.find(word);
+
+		documentTitles.at(documentIndex).second = documentTitles.at(documentIndex).second +1;
+		//If this word hasn't been indexed yet
+		if(item == index.end()){
+
+			vector< int > nums;
+			nums.push_back(documentIndex);
+			pair< string, vector<int> > newItem (word, nums);
+			index.insert(newItem);
+
+		} 
+		//If this word has already been indexed
+		else {
+			item->second.push_back(documentIndex);
+		}
 }
 
 vector<string> LinearIndex::getDocumentsForQuery(vector<string> inDoc, vector<string> notInDoc, bool both){
 	
-	vector< pair <int, int> > docs;
+	vector< int > docs;
 
 	for(int i = 0; i < inDoc.size(); i++){
 		Porter2Stemmer::stem(inDoc.at(i));
@@ -72,17 +104,17 @@ vector<string> LinearIndex::getDocumentsForQuery(vector<string> inDoc, vector<st
 			notInDoc.at(i)[j] = tolower(notInDoc.at(i)[j]);
 	}
 
-	for (unordered_map<string, vector< pair<int, int> > >::iterator it = index.begin(); it != index.end(); ++it){
+	for (unordered_map<string, vector< int > >::iterator it = index.begin(); it != index.end(); ++it){
 
 		for(int i = 0; i < inDoc.size(); i++){
 			if(it->first == inDoc.at(i)){
 				for(int j = 0; j < it->second.size(); j++){
 					bool add = false;
 					if(both){
-						unordered_map<string, vector< pair<int, int> > >::iterator other = index.find(inDoc.at(i+1));
+						unordered_map<string, vector< int > >::iterator other = index.find(inDoc.at(i+1));
 						if(other != index.end()){
 							for(int k = 0; k < other->second.size(); k++){
-								if(other->second.at(k).first == it->second.at(j).first){
+								if(other->second.at(k) == it->second.at(j)){
 									add = true;
 									break;
 								}
@@ -102,12 +134,12 @@ vector<string> LinearIndex::getDocumentsForQuery(vector<string> inDoc, vector<st
 
 
 	for(int i = 0; i < notInDoc.size(); i++){
-		unordered_map<string, vector< pair<int, int> > >::iterator item = index.find(notInDoc.at(i));
+		unordered_map<string, vector< int > >::iterator item = index.find(notInDoc.at(i));
 		if(item != index.end()){
 			for(int j = 0; j < item->second.size(); j++){
 				for(int k = 0; k < docs.size(); k++){
-					if(item->second.at(j).first == docs.at(k).first){
-						docs.at(k).first = -1;
+					if(item->second.at(j) == docs.at(k)){
+						docs.at(k) = -1;
 					}
 				}
 			}
@@ -117,8 +149,8 @@ vector<string> LinearIndex::getDocumentsForQuery(vector<string> inDoc, vector<st
 	vector<string> titles;
 
 	for(int i = 0; i < docs.size(); i++){
-		if(docs.at(i).first != -1)
-			titles.push_back(documentTitles.at(docs.at(i).first).first);
+		if(docs.at(i) != -1)
+			titles.push_back(documentTitles.at(docs.at(i)).first);
 	}
 
 
@@ -128,11 +160,11 @@ vector<string> LinearIndex::getDocumentsForQuery(vector<string> inDoc, vector<st
 void LinearIndex::print(){
 	cout << "Printing!\n";
 
-	for (unordered_map<string, vector< pair<int, int> > >::iterator it = index.begin(); it != index.end(); ++it){
-  		vector< pair<int, int> > nums = it->second;
+	for (unordered_map<string, vector< int > >::iterator it = index.begin(); it != index.end(); ++it){
+  		vector< int > nums = it->second;
   		cout << it->first << ": ";
   		for(int i = 0; i < nums.size(); i++)
-  			cout << documentTitles.at(nums.at(i).first).first << ", " << nums.at(i).second << "\t";
+  			cout << documentTitles.at(nums.at(i)).first << "\t";
   		cout << endl;
 	}
 }
@@ -144,10 +176,10 @@ bool LinearIndex::writeToFile(string fileName){
 		os << documentTitles.at(i).first << " <1> "  << documentTitles.at(i).second << endl;
 	}
 	os << "<2>" << endl;
-	for (unordered_map<string, vector< pair<int, int> > >::iterator it = index.begin(); it != index.end(); ++it){
+	for (unordered_map<string, vector< int > >::iterator it = index.begin(); it != index.end(); ++it){
 		os << it->first;
 		for(int i = 0; i < it->second.size(); i++){
-			os << " " << it->second.at(i).first << " " << it->second.at(i).second;
+			os << " " << it->second.at(i) < " ";  
 		}
 		os << " <3>\n";
 	}
@@ -195,14 +227,12 @@ bool LinearIndex::readFromFile(string fileName){
 				nums.push_back(atoi(num.c_str()));
 			}
 		}
-		pair<string, vector< pair<int, int> > > newItem;
+
+		pair<string, vector< int > > newItem;
 		newItem.first = name;
 
-		for(int i = 0; i < nums.size(); i+=2){
-			pair<int, int> numPair;
-			numPair.first = nums.at(i);
-			numPair.second = nums.at(i+1);
-			newItem.second.push_back(numPair);
+		for(int i = 0; i < nums.size(); i++){
+			newItem.second.push_back(nums.at(i));
 		}
 
 		index.insert(newItem);

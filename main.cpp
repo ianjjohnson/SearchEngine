@@ -15,7 +15,6 @@ int main(int argc, char* argv[])
    XMLParser parser("Input.xml");
    parser.readFileToIndex("Input.xml", &ind);
 
-
    /*LinearIndex ind;
 
    XMLParser parser("Input.xml");
