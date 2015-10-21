@@ -84,19 +84,24 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
 
    cout << "found root node\n";
 
-   int num = 1;
 
+   vector<string> words;
+   int num = 0;
    for (rapidxml::xml_node<> * document_node = root_node->first_node("page"); document_node; document_node = document_node->next_sibling()){
       rapidxml::xml_node<> * text;
       text = document_node->first_node("revision")->first_node("text");
       string docName = document_node->first_node("title")->value();
+      
+      if(docName.substr(0, 4) == "User" || docName.substr(0,4) == "File") continue;
+
+
+      words.clear();
       if(text){
          stringstream ss(text->value());
-
-         vector<string> words;
+         
          while(!ss.eof()){
-            string word;
-            ss >> word;
+         	string word;
+         	ss >> word;
             if(!isStopWord(word) && isNotXMLTag(word)){
             	for(int i = 0; i < word.size(); i++)
 					word[i] = tolower(word[i]);
@@ -106,10 +111,11 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
          }
 
          index->addDocument(docName, words);
+
+         cout << num++ << docName << endl;
          
       }
 
-      cout << num++ << endl;
       //if(num > 30) break;
    }
 
