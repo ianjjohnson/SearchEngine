@@ -101,11 +101,11 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
          while(!ss.eof()){
          	string word;
          	ss >> word;
-            if(!isStopWord(word) && isNotXMLTag(word)){
+            //if(!isStopWord(word) && isNotXMLTag(word)){
 				word[0] = tolower(word[0]);
-            	Porter2Stemmer::stem(word);
+            	//Porter2Stemmer::stem(word);
             	index->addWordForDocument(indexOfDoc, word);
-            }
+           	//}
          }
 
 

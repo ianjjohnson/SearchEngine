@@ -93,15 +93,17 @@ vector<string> LinearIndex::getDocumentsForQuery(vector<string> inDoc, vector<st
 	vector< int > docs;
 
 	for(int i = 0; i < inDoc.size(); i++){
-		Porter2Stemmer::stem(inDoc.at(i));
-		for(int j = 0; j < inDoc.at(i).size(); j++)
-			inDoc.at(i)[j] = tolower(inDoc.at(i)[j]);
+		//Porter2Stemmer::stem(inDoc.at(i));
+		//for(int j = 0; j < inDoc.at(i).size(); j++)
+			//inDoc.at(i)[j] = tolower(inDoc.at(i)[j]);
+		inDoc.at(i)[0] = tolower(inDoc.at(i)[0]);
 	}
 
 	for(int i = 0; i < notInDoc.size(); i++){
-		Porter2Stemmer::stem(notInDoc.at(i));
-		for(int j = 0; j < notInDoc.at(i).size(); j++)
-			notInDoc.at(i)[j] = tolower(notInDoc.at(i)[j]);
+		//Porter2Stemmer::stem(notInDoc.at(i));
+		//for(int j = 0; j < notInDoc.at(i).size(); j++)
+		//	notInDoc.at(i)[j] = tolower(notInDoc.at(i)[j]);
+		notInDoc.at(i)[0] = tolower(notInDoc.at(i)[0]);
 	}
 
 	for (unordered_map<string, vector< int > >::iterator it = index.begin(); it != index.end(); ++it){
