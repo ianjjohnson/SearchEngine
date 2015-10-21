@@ -98,6 +98,8 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
             string word;
             ss >> word;
             if(!isStopWord(word) && isNotXMLTag(word)){
+            	for(int i = 0; i < word.size(); i++)
+					word[i] = tolower(word[i]);
             	Porter2Stemmer::stem(word);
             	words.push_back(word);
             }
@@ -107,7 +109,8 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
          
       }
 
-      if(num > 30) break;
+      cout << num++ << endl;
+      //if(num > 30) break;
    }
 
    return true;
