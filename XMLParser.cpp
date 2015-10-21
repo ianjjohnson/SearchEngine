@@ -1,32 +1,7 @@
 #include "XMLParser.h"
 #include "porter2_stemmer.h"
-
-bool isNotXMLTag(string token){
-	return token.find("<") == string::npos
-		&& token.find(">") == string::npos
-		&& token.find("=") == string::npos
-		&& token.find("-") == string::npos
-		&& token.find(".") == string::npos
-		&& token.find(";") == string::npos
-		&& token.find(":") == string::npos
-		&& token.find("(") == string::npos
-		&& token.find(")") == string::npos
-		&& token.find("/") == string::npos
-		&& token.find("]") == string::npos
-		&& token.find("[") == string::npos
-		&& token.find(",") == string::npos
-		&& token.find("|") == string::npos
-		&& token.find("\'") == string::npos
-		&& token.find("}") == string::npos
-		&& token.find("{") == string::npos;
-}
-
-bool XMLParser::isStopWord(string token){
-	for(int i = 0; i < stopWords.size(); i++){
-		if(token == stopWords.at(i)) return true;
-	}
-	return false;
-}
+#include "rapidxml/rapidxml.hpp"
+#include <sstream>
 
 XMLParser::XMLParser(string fileName){
 	is.open(fileName);
@@ -46,6 +21,33 @@ XMLParser::XMLParser(string fileName){
 
 }
 
+bool XMLParser::isNotXMLTag(string token){
+   return token.find("<") == string::npos
+      && token.find(">") == string::npos
+      && token.find("=") == string::npos
+      && token.find("-") == string::npos
+      && token.find(".") == string::npos
+      && token.find(";") == string::npos
+      && token.find(":") == string::npos
+      && token.find("(") == string::npos
+      && token.find(")") == string::npos
+      && token.find("/") == string::npos
+      && token.find("]") == string::npos
+      && token.find("[") == string::npos
+      && token.find(",") == string::npos
+      && token.find("|") == string::npos
+      && token.find("\'") == string::npos
+      && token.find("}") == string::npos
+      && token.find("{") == string::npos;
+}
+
+bool XMLParser::isStopWord(string token){
+   for(int i = 0; i < stopWords.size(); i++){
+      if(token == stopWords.at(i)) return true;
+   }
+   return false;
+}
+
 bool XMLParser::readFile(IndexInterface* index){
 	skipIntroPage();
 	int num = 0;
@@ -63,6 +65,52 @@ bool XMLParser::skipIntroPage(){
 	while(token != "<page>") is >> token;
 
 	return true;
+}
+
+bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
+	rapidxml::xml_document<> doc;
+   rapidxml::xml_node<> * root_node;
+   // Read the xml file into a vector
+   ifstream theFile (fileName);
+
+   cout << "loaded the file\n";
+
+   vector<char> buffer((istreambuf_iterator<char>(theFile)), istreambuf_iterator<char>());
+   buffer.push_back('\0');
+   // Parse the buffer using the xml file parsing library into doc 
+   doc.parse<0>(&buffer[0]);
+   // Find our root node
+   root_node = doc.first_node("mediawiki");
+
+   cout << "found root node\n";
+
+   int num = 1;
+
+   for (rapidxml::xml_node<> * document_node = root_node->first_node("page"); document_node; document_node = document_node->next_sibling()){
+      rapidxml::xml_node<> * text;
+      text = document_node->first_node("revision")->first_node("text");
+      string docName = document_node->first_node("title")->value();
+      if(text){
+         stringstream ss(text->value());
+
+         vector<string> words;
+         while(!ss.eof()){
+            string word;
+            ss >> word;
+            if(!isStopWord(word) && isNotXMLTag(word)){
+            	Porter2Stemmer::stem(word);
+            	words.push_back(word);
+            }
+         }
+
+         index->addDocument(docName, words);
+         
+      }
+
+      if(num > 30) break;
+   }
+
+   return true;
 }
 
 bool XMLParser::writeDocToIndex(IndexInterface* index){

@@ -12,6 +12,8 @@ public:
 	bool writeDocToIndex(IndexInterface*);
 	bool skipIntroPage();
 	bool readFile(IndexInterface*);
+	bool readFileToIndex(string fileName, IndexInterface* index);
+	bool isNotXMLTag(string token);
 private:
 	ifstream is;
 	vector<string> stopWords;

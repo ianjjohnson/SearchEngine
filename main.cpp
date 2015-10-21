@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include "LinearIndex.h"
 #include "XMLParser.h"
 
@@ -8,16 +9,21 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
+   
    LinearIndex ind;
-   /*XMLParser parser("Input.xml");
-   parser.skipIntroPage();
 
-   for(int i = 0; i < 57; i++)
-   		parser.writeDocToIndex(&ind);
+   XMLParser parser("Input.xml");
+   parser.readFileToIndex("Input.xml", &ind);
 
-   vector<string> words;*/
 
-   /*words.push_back("Hello");
+   /*LinearIndex ind;
+
+   XMLParser parser("Input.xml");
+   parser.readFile(&ind);
+
+   vector<string> words;
+
+   words.push_back("Hello");
    words.push_back("World");
    words.push_back("Data");
 
@@ -41,9 +47,10 @@ int main(int argc, char* argv[])
 
    ind.addDocument("Document 3", words);
 
-   ind.print();*/
+   ind.print();
    ind.readFromFile("read.txt");
-   //ind.print();
+   ind.print();
+   */
 
    vector<string> allow;
    vector<string> disallow;
