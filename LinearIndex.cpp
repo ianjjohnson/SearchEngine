@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
+#include <map>
 
 LinearIndex::~LinearIndex() {
 
@@ -121,8 +122,6 @@ vector<string> LinearIndex::getDocumentsForQuery(vector<string> inDoc, vector<st
 
 	for (unordered_map<string, vector< int > >::iterator it = index.begin(); it != index.end(); ++it){
 
-		cout << it->first << endl;
-
 		for(int i = 0; i < inDoc.size(); i++){
 			if(it->first == inDoc.at(i)){
 				for(int j = 0; j < it->second.size(); j++){
@@ -163,7 +162,7 @@ vector<string> LinearIndex::getDocumentsForQuery(vector<string> inDoc, vector<st
 
 	cout << docs.size() << endl;
 
-	int i, j, first;
+	/*int i, j, first;
       int temp;
       int length = docs.size();
       for (i= length - 1; i > 0; i--)
@@ -177,16 +176,32 @@ vector<string> LinearIndex::getDocumentsForQuery(vector<string> inDoc, vector<st
          temp = docs.at(first);   // Swap smallest found with element in position i.
          docs.at(first) = docs.at(i);
          docs.at(i) = temp;
-     }
+     }*/
 
-	vector<string> titles;
+	map<int, string> titles;
 
 	for(int i = 0; i < docs.size(); i++){
-		if(docs.at(i) != -1)
-			titles.push_back(documentTitles.at(docs.at(i)).first);
+		if(docs.at(i) != -1){
+			int numberOfAppearances = count(docs.begin(), docs.end(), docs.at(i));
+			pair<int, string> newPair;
+			newPair.second = documentTitles.at(docs.at(i)).first;
+			newPair.first = (int)(1000*numberOfAppearances/documentTitles.at(docs.at(i)).second);
+			titles.insert(newPair);
+			docs.erase(remove(docs.begin(), docs.end(), docs.at(i)));
+		}
 	}
 
-	return titles;
+	cout << "About to make title vector\n";
+
+	vector<string> titleVector;
+
+	for(map<int, string>::iterator it = titles.begin(); it != titles.end(); ++it)
+		if(find(titleVector.begin(), titleVector.end(), it->second) == titleVector.end())
+			titleVector.push_back(it->second);
+
+	cout << "Made title vector\n";
+
+	return titleVector;
 }
 
 void LinearIndex::print(){

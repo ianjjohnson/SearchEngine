@@ -101,17 +101,16 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
          while(!ss.eof()){
          	string word;
          	ss >> word;
-            if(/*!isStopWord(word) */!isXMLTag(word)){
+            //if(/*!isStopWord(word) */!isXMLTag(word)){
 				word[0] = tolower(word[0]);
             	Porter2Stemmer::stem(word);
             	index->addWordForDocument(indexOfDoc, word);
            	}
-         }
+       }
 
 
          cout << num++ << docName << endl;
          
-      }
 
       //if(num > 30) break;
    }
