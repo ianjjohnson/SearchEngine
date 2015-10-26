@@ -7,9 +7,31 @@ using namespace std;
 
 //AVLTreeNode *createNewNode(int key);
 
+vector<string> stopWords;
+
+bool isStopWord(string token){
+   for(int i = 0; i < stopWords.size(); i++){
+   	  for(int i = 0; i < token.size(); i++){
+   	  	token[i] = tolower(token[i]);
+   	  }
+      if(token == stopWords.at(i)) return true;
+   }
+   return false;
+}
+
 int main(int argc, char* argv[])
 {
    
+	ifstream getStopWords("stopwords.txt");
+	string token = "";
+
+	while(token != "<-1>"){
+		getStopWords >> token;
+		for(int i = 0; i < token.size(); i++)
+			token[i] = tolower(token[i]);
+		stopWords.push_back(token);
+	}
+
    LinearIndex ind;
 
    XMLParser parser("Input.xml");
@@ -59,10 +81,13 @@ int main(int argc, char* argv[])
    		if(string(argv[i]) == "OR") both = false;
    		else if(string(argv[i]) == "AND") both = true;
    		else if(string(argv[i]) == "NOT"){
-   			disallow.push_back(string(argv[i+1]));
-   			i++;
+   			if(!isStopWord(string(argv[i+1]))){
+   				disallow.push_back(string(argv[i+1]));
+   				i++;
+   			}
    		} else {
-   			allow.push_back(string(argv[i]));
+   			if(!isStopWord(string(argv[i])))
+   				allow.push_back(string(argv[i]));
    		}
    }
 

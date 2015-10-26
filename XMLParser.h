@@ -16,6 +16,4 @@ public:
 	bool isXMLTag(string token);
 private:
 	ifstream is;
-	vector<string> stopWords;
-	bool isStopWord(string);
 };

@@ -126,7 +126,7 @@ vector<string> LinearIndex::getDocumentsForQuery(vector<string> inDoc, vector<st
 			if(it->first == inDoc.at(i)){
 				for(int j = 0; j < it->second.size(); j++){
 					bool add = false;
-					if(both){
+					if(both && i+1 < inDoc.size()){
 						unordered_map<string, vector< int > >::iterator other = index.find(inDoc.at(i+1));
 						if(other != index.end()){
 							for(int k = 0; k < other->second.size(); k++){

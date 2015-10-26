@@ -7,18 +7,6 @@ XMLParser::XMLParser(string fileName){
 	is.open(fileName);
 
 	cout << "File opened!\n";
-
-	ifstream getStopWords("stopwords.txt");
-	string token = "";
-
-	while(token != "<-1>"){
-		getStopWords >> token;
-		for(int i = 0; i < token.size(); i++)
-			token[i] = tolower(token[i]);
-		stopWords.push_back(token);
-	}
-
-
 }
 
 bool XMLParser::isXMLTag(string token){
@@ -39,13 +27,6 @@ bool XMLParser::isXMLTag(string token){
       || token.find("\'") != string::npos
       || token.find("}") != string::npos
       || token.find("{") != string::npos;
-}
-
-bool XMLParser::isStopWord(string token){
-   for(int i = 0; i < stopWords.size(); i++){
-      if(token == stopWords.at(i)) return true;
-   }
-   return false;
 }
 
 bool XMLParser::readFile(IndexInterface* index){
