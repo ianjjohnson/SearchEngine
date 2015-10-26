@@ -21,24 +21,24 @@ XMLParser::XMLParser(string fileName){
 
 }
 
-bool XMLParser::isNotXMLTag(string token){
-   return token.find("<") == string::npos
-      && token.find(">") == string::npos
-      && token.find("=") == string::npos
-      && token.find("-") == string::npos
-      && token.find(".") == string::npos
-      && token.find(";") == string::npos
-      && token.find(":") == string::npos
-      && token.find("(") == string::npos
-      && token.find(")") == string::npos
-      && token.find("/") == string::npos
-      && token.find("]") == string::npos
-      && token.find("[") == string::npos
-      && token.find(",") == string::npos
-      && token.find("|") == string::npos
-      && token.find("\'") == string::npos
-      && token.find("}") == string::npos
-      && token.find("{") == string::npos;
+bool XMLParser::isXMLTag(string token){
+   return token.find("<") != string::npos
+      || token.find(">") != string::npos
+      || token.find("=") != string::npos
+      || token.find("-") != string::npos
+      || token.find(".") != string::npos
+      || token.find(";") != string::npos
+      || token.find(":") != string::npos
+      || token.find("(") != string::npos
+      || token.find(")") != string::npos
+      || token.find("/") != string::npos
+      || token.find("]") != string::npos
+      || token.find("[") != string::npos
+      || token.find(",") != string::npos
+      || token.find("|") != string::npos
+      || token.find("\'") != string::npos
+      || token.find("}") != string::npos
+      || token.find("{") != string::npos;
 }
 
 bool XMLParser::isStopWord(string token){
@@ -101,11 +101,11 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
          while(!ss.eof()){
          	string word;
          	ss >> word;
-            //if(!isStopWord(word) && isNotXMLTag(word)){
+            if(/*!isStopWord(word) */!isXMLTag(word)){
 				word[0] = tolower(word[0]);
-            	//Porter2Stemmer::stem(word);
+            	Porter2Stemmer::stem(word);
             	index->addWordForDocument(indexOfDoc, word);
-           	//}
+           	}
          }
 
 

@@ -16,6 +16,7 @@ public:
 
 	virtual vector<string> getDocumentsForQuery(vector<string> inDoc, vector<string> notInDoc, bool both) = 0;
 
+	virtual bool sortComparator(int, int, vector<string>) = 0;
 
 	virtual bool writeToFile(string) = 0;
 	virtual bool readFromFile(string) = 0;

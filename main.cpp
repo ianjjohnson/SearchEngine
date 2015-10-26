@@ -12,8 +12,8 @@ int main(int argc, char* argv[])
    
    LinearIndex ind;
 
-   XMLParser parser("Input.xml");
-   parser.readFileToIndex("Input.xml", &ind);
+   //XMLParser parser("Input.xml");
+   //parser.readFileToIndex("Input.xml", &ind);
 
    /*LinearIndex ind;
 
@@ -46,10 +46,9 @@ int main(int argc, char* argv[])
 
    ind.addDocument("Document 3", words);
 
-   ind.print();
+   ind.print();*/
    ind.readFromFile("read.txt");
-   ind.print();
-   */
+
 
    vector<string> allow;
    vector<string> disallow;

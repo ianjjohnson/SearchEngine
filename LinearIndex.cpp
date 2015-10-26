@@ -86,6 +86,19 @@ bool LinearIndex::addWordForDocument(int documentIndex, string word){
 		else {
 			item->second.push_back(documentIndex);
 		}
+
+		return true;
+}
+
+bool LinearIndex::sortComparator(int first, int second, vector<string> wordsInSearchQuery){
+	int numMatches1 = 0;
+	int numMatches2 = 0;
+	for(int i = 0; i < wordsInSearchQuery.size(); i++){
+		unordered_map<string, vector< int > >::iterator item = index.find(wordsInSearchQuery.at(i));
+		numMatches1	+= count(item->second.begin(), item->second.end(), first);
+		numMatches2 += count(item->second.begin(), item->second.end(), second);
+	}
+	return numMatches1/documentTitles.at(first).second < numMatches2/documentTitles.at(second).second;
 }
 
 vector<string> LinearIndex::getDocumentsForQuery(vector<string> inDoc, vector<string> notInDoc, bool both){
@@ -93,20 +106,22 @@ vector<string> LinearIndex::getDocumentsForQuery(vector<string> inDoc, vector<st
 	vector< int > docs;
 
 	for(int i = 0; i < inDoc.size(); i++){
-		//Porter2Stemmer::stem(inDoc.at(i));
+		Porter2Stemmer::stem(inDoc.at(i));
 		//for(int j = 0; j < inDoc.at(i).size(); j++)
 			//inDoc.at(i)[j] = tolower(inDoc.at(i)[j]);
 		inDoc.at(i)[0] = tolower(inDoc.at(i)[0]);
 	}
 
 	for(int i = 0; i < notInDoc.size(); i++){
-		//Porter2Stemmer::stem(notInDoc.at(i));
+		Porter2Stemmer::stem(notInDoc.at(i));
 		//for(int j = 0; j < notInDoc.at(i).size(); j++)
 		//	notInDoc.at(i)[j] = tolower(notInDoc.at(i)[j]);
 		notInDoc.at(i)[0] = tolower(notInDoc.at(i)[0]);
 	}
 
 	for (unordered_map<string, vector< int > >::iterator it = index.begin(); it != index.end(); ++it){
+
+		cout << it->first << endl;
 
 		for(int i = 0; i < inDoc.size(); i++){
 			if(it->first == inDoc.at(i)){
@@ -129,8 +144,6 @@ vector<string> LinearIndex::getDocumentsForQuery(vector<string> inDoc, vector<st
 			}
 			if(both) i++;
 		}
-
-		//Sort by relevance and remove duplicates
 	}
 
 
@@ -148,13 +161,30 @@ vector<string> LinearIndex::getDocumentsForQuery(vector<string> inDoc, vector<st
 		}
 	}
 
+	cout << docs.size() << endl;
+
+	int i, j, first;
+      int temp;
+      int length = docs.size();
+      for (i= length - 1; i > 0; i--)
+     	{
+           first = 0;                 // initialize to subscript of first element
+           for (j=1; j<=i; j++)   // locate smallest between positions 1 and i.
+          {
+                 if (sortComparator(docs.at(i), docs.at(first), inDoc))
+                 	first = j;
+          }
+         temp = docs.at(first);   // Swap smallest found with element in position i.
+         docs.at(first) = docs.at(i);
+         docs.at(i) = temp;
+     }
+
 	vector<string> titles;
 
 	for(int i = 0; i < docs.size(); i++){
 		if(docs.at(i) != -1)
 			titles.push_back(documentTitles.at(docs.at(i)).first);
 	}
-
 
 	return titles;
 }
@@ -181,7 +211,7 @@ bool LinearIndex::writeToFile(string fileName){
 	for (unordered_map<string, vector< int > >::iterator it = index.begin(); it != index.end(); ++it){
 		os << it->first;
 		for(int i = 0; i < it->second.size(); i++){
-			os << " " << it->second.at(i) < " ";  
+			os << " " << it->second.at(i) << " ";  
 		}
 		os << " <3>\n";
 	}

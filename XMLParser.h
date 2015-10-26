@@ -13,7 +13,7 @@ public:
 	bool skipIntroPage();
 	bool readFile(IndexInterface*);
 	bool readFileToIndex(string fileName, IndexInterface* index);
-	bool isNotXMLTag(string token);
+	bool isXMLTag(string token);
 private:
 	ifstream is;
 	vector<string> stopWords;
