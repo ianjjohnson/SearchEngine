@@ -25,8 +25,8 @@ public:
 	void print();
 
 private:
-	vector< pair<string, int> > documentTitles;
-	unordered_map<string, vector<int> > index;
+	vector< pair<string, int> > documentTitles; //contains each document's title and number of words (for ranking)
+	unordered_map<string, vector<int> > index; //The actual index object
 	
 };
 

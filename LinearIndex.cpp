@@ -57,6 +57,11 @@ bool LinearIndex::addDocument(string name, vector<string> relevantWords){return 
 	return true;
 }*/
 
+/*
+Add a document to the index by document name and returns it's index in the docTitles list
+@param name - the name of the document
+@return - the index of the document in the documentTitles vector
+*/
 int LinearIndex::addDocument(string name){
 	int indexOfNewDoc = documentTitles.size();
 
@@ -70,6 +75,11 @@ int LinearIndex::addDocument(string name){
 	return documentTitles.size()-1;
 }
 
+/*
+Adds a word to be indexed for a specific document
+@param documentIndex - the index of the document in the documentTitles vector
+@param word - the word to be added to the index for this document
+*/
 bool LinearIndex::addWordForDocument(int documentIndex, string word){
 		unordered_map< string, vector< int > >::iterator item = index.find(word);
 
@@ -91,6 +101,10 @@ bool LinearIndex::addWordForDocument(int documentIndex, string word){
 		return true;
 }
 
+/*
+A comparator for sorting two items to be output.
+@param first - the index of the first document 
+*/
 bool LinearIndex::sortComparator(int first, int second, vector<string> wordsInSearchQuery){
 	int numMatches1 = 0;
 	int numMatches2 = 0;
@@ -101,6 +115,11 @@ bool LinearIndex::sortComparator(int first, int second, vector<string> wordsInSe
 	}
 	return numMatches1/documentTitles.at(first).second < numMatches2/documentTitles.at(second).second;
 }
+
+/*
+THIS SHOULD ONLY GET EVERYTHING FOR ONE DOC.
+INTERSECTION SHOULD BE DONE IN XML PARSER
+*/
 
 vector<string> LinearIndex::getDocumentsForQuery(vector<string> inDoc, vector<string> notInDoc, bool both){
 	
@@ -162,22 +181,6 @@ vector<string> LinearIndex::getDocumentsForQuery(vector<string> inDoc, vector<st
 
 	cout << docs.size() << endl;
 
-	/*int i, j, first;
-      int temp;
-      int length = docs.size();
-      for (i= length - 1; i > 0; i--)
-     	{
-           first = 0;                 // initialize to subscript of first element
-           for (j=1; j<=i; j++)   // locate smallest between positions 1 and i.
-          {
-                 if (sortComparator(docs.at(i), docs.at(first), inDoc))
-                 	first = j;
-          }
-         temp = docs.at(first);   // Swap smallest found with element in position i.
-         docs.at(first) = docs.at(i);
-         docs.at(i) = temp;
-     }*/
-
 	map<int, string> titles;
 
 	for(int i = 0; i < docs.size(); i++){
@@ -204,6 +207,9 @@ vector<string> LinearIndex::getDocumentsForQuery(vector<string> inDoc, vector<st
 	return titleVector;
 }
 
+/*
+Prints the index out to the console -- only for debugging
+*/
 void LinearIndex::print(){
 	cout << "Printing!\n";
 
@@ -215,7 +221,6 @@ void LinearIndex::print(){
   		cout << endl;
 	}
 }
-
 
 bool LinearIndex::writeToFile(string fileName){
 	ofstream os(fileName);

@@ -5,15 +5,28 @@
 
 using namespace std;
 
-//AVLTreeNode *createNewNode(int key);
+void doSearch(int, char**);
 
+
+//The stop words to ignore in search
 vector<string> stopWords;
+LinearIndex ind;
 
+/*
+Checks if a given token is a stop word
+@param token - the word to compare to all the stop words
+@return - true if the token is a stop word
+*/
 bool isStopWord(string token){
+
+   //send token to lower case
+   for(int i = 0; i < token.size(); i++){
+         token[i] = tolower(token[i]);
+   }
+
+
+   //For every stop word, check if it's a match
    for(int i = 0; i < stopWords.size(); i++){
-   	  for(int i = 0; i < token.size(); i++){
-   	  	token[i] = tolower(token[i]);
-   	  }
       if(token == stopWords.at(i)) return true;
    }
    return false;
@@ -32,83 +45,57 @@ int main(int argc, char* argv[])
 		stopWords.push_back(token);
 	}
 
-   LinearIndex ind;
-
    XMLParser parser("Input.xml");
-   parser.readFileToIndex("Input.xml", &ind);
+  // parser.readFileToIndex("Input.xml", &ind);
 
    /*LinearIndex ind;
 
    XMLParser parser("Input.xml");
    parser.readFile(&ind);
 
-   vector<string> words;
-
-   words.push_back("Hello");
-   words.push_back("World");
-   words.push_back("Data");
-
-   ind.addDocument("Document 1", words);
-
-   words.clear();
-
-   words.push_back("Computer");
-   words.push_back("Science");
-   words.push_back("Data");
-   words.push_back("Hello");
-
-   ind.addDocument("Document 2", words);
-
-   words.clear();
-
-   words.push_back("Data");
-   words.push_back("Structures");
-   words.push_back("Algorithms");
-   words.push_back("Data");
-
-   ind.addDocument("Document 3", words);
-
    ind.print();*/
-   //ind.readFromFile("read.txt");
+   ind.readFromFile("index.txt");
 
 
+   doSearch(argc, argv);
+}
+
+/*
+Searches the index for a series of search queries in argv
+@param argc - the number of command line args
+@param argv - the list of 
+*/
+void doSearch(int argc, char* argv[]){
    vector<string> allow;
    vector<string> disallow;
+
+   /*
+   DO IT THIS WAY!
+   vector<string> and;
+   vector<string> or;
+   vector<string> not;
+   */
 
    bool both = false;
 
    for(int i = 1; i < argc; i++){
-   		if(string(argv[i]) == "OR") both = false;
-   		else if(string(argv[i]) == "AND") both = true;
-   		else if(string(argv[i]) == "NOT"){
-   			if(!isStopWord(string(argv[i+1]))){
-   				disallow.push_back(string(argv[i+1]));
-   				i++;
-   			}
-   		} else {
-   			if(!isStopWord(string(argv[i])))
-   				allow.push_back(string(argv[i]));
-   		}
+         if(string(argv[i]) == "OR") both = false;
+         else if(string(argv[i]) == "AND") both = true;
+         else if(string(argv[i]) == "NOT"){
+            if(!isStopWord(string(argv[i+1]))){
+               disallow.push_back(string(argv[i+1]));
+               i++;
+            }
+         } else {
+            if(!isStopWord(string(argv[i])))
+               allow.push_back(string(argv[i]));
+         }
    }
 
    vector<string> outputFromSearch = ind.getDocumentsForQuery(allow, disallow, both);
 
    for(int i = 0; i < outputFromSearch.size(); i++)
-   		cout << outputFromSearch.at(i) << endl;
+         cout << outputFromSearch.at(i) << endl;
 
-   	ind.writeToFile("index.txt");
+      ind.writeToFile("index.txt");
 }
-
-/*---------------------------------------------
-// Create a new tree node with the given key
-//---------------------------------------------
-AVLTreeNode *createNewNode(int key)
-{
-   AVLTreeNode *temp = new AVLTreeNode();
-   temp->key = key;
-   temp->left = NULL;
-   temp->right = NULL;
-   temp->parent = NULL;
-   temp->balanceFactor = '=';
-   return temp;
-} */
