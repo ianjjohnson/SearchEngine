@@ -14,7 +14,7 @@ public:
 	virtual int addDocument(string name) = 0;
 	virtual bool addWordForDocument(int documentIndex, string word) = 0;
 
-	virtual vector<string> getDocumentsForQuery(vector<string> inDoc, vector<string> notInDoc, bool both) = 0;
+	virtual vector<string> getDocumentsForWord(string word)= 0;
 
 	virtual bool sortComparator(int, int, vector<string>) = 0;
 

@@ -121,7 +121,42 @@ THIS SHOULD ONLY GET EVERYTHING FOR ONE DOC.
 INTERSECTION SHOULD BE DONE IN XML PARSER
 */
 
-vector<string> LinearIndex::getDocumentsForQuery(vector<string> inDoc, vector<string> notInDoc, bool both){
+vector<string> LinearIndex::getDocumentsForWord(string word){
+
+	Porter2Stemmer::stem(word);
+	word[0] = tolower(word[0]);
+
+	unordered_map<string, vector< int > >::iterator wordInIndex = index.find(word);
+
+	vector<int> docs = wordInIndex->second;
+
+	map<int, string> titles;
+
+	for(int i = 0; i < docs.size(); i++){
+		if(docs.at(i) != -1){
+			int numberOfAppearances = count(docs.begin(), docs.end(), docs.at(i));
+			pair<int, string> newPair;
+			newPair.second = documentTitles.at(docs.at(i)).first;
+			newPair.first = (int)(1000*numberOfAppearances/documentTitles.at(docs.at(i)).second);
+			titles.insert(newPair);
+			docs.erase(remove(docs.begin(), docs.end(), docs.at(i)));
+		}
+	}
+
+	cout << "About to make title vector\n";
+
+	vector<string> titleVector;
+
+	for(map<int, string>::iterator it = titles.begin(); it != titles.end(); ++it)
+		if(find(titleVector.begin(), titleVector.end(), it->second) == titleVector.end())
+			titleVector.push_back(it->second);
+
+	cout << "Made title vector\n";
+
+	return titleVector;
+}
+
+/*vector<string> LinearIndex::getDocumentsForQuery(vector<string> inDoc, vector<string> notInDoc, bool both){
 	
 	vector< int > docs;
 
@@ -205,7 +240,7 @@ vector<string> LinearIndex::getDocumentsForQuery(vector<string> inDoc, vector<st
 	cout << "Made title vector\n";
 
 	return titleVector;
-}
+}*/
 
 /*
 Prints the index out to the console -- only for debugging

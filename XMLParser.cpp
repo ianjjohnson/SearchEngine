@@ -99,6 +99,11 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
       //Grab the text and document name of the current document
       text = document_node->first_node("revision")->first_node("text");
       string docName = document_node->first_node("title")->value();
+
+
+      string fileName = "SearchDocs/";
+      fileName = fileName + docName + ".txt";
+      ofstream writeDocFile(fileName);
       
       //Ignore documents called user or file. They're garbage
       if(docName.substr(0, 4) == "User" || docName.substr(0,4) == "File") continue;
@@ -119,6 +124,7 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
             //save the current word and add it to the index for the current document number
          	string word;
          	ss >> word;
+         	writeDocFile << word;
             //if(/*!isStopWord(word) */!isXMLTag(word)){
 				word[0] = tolower(word[0]);
             	Porter2Stemmer::stem(word);
@@ -129,6 +135,7 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
        }
 
 
+       writeDocFile.close();
        cout << num++ << docName << endl;
    }
 
