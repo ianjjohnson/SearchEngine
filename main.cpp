@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
 	}
 
    XMLParser parser("Input.xml");
-  //parser.readFileToIndex("Input.xml", &ind);
+  	//parser.readFileToIndex("Input.xml", &ind);
 
    /*LinearIndex ind;
 
