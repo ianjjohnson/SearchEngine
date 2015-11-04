@@ -128,6 +128,11 @@ vector<string> LinearIndex::getDocumentsForWord(string word){
 
 	unordered_map<string, vector< int > >::iterator wordInIndex = index.find(word);
 
+	if(wordInIndex == index.end()){
+		vector<string> empty;
+		return empty;
+	}
+
 	vector<int> docs = wordInIndex->second;
 
 	map<int, string> titles;
@@ -143,7 +148,7 @@ vector<string> LinearIndex::getDocumentsForWord(string word){
 		}
 	}
 
-	cout << "About to make title vector\n";
+	cout << "About to make title vector for word "<< word <<  "\n";
 
 	vector<string> titleVector;
 
@@ -154,6 +159,14 @@ vector<string> LinearIndex::getDocumentsForWord(string word){
 	cout << "Made title vector\n";
 
 	return titleVector;
+}
+
+int LinearIndex::numWords(){
+	return index.size();
+}
+
+int LinearIndex::numDocs(){
+	return documentTitles.size();
 }
 
 /*vector<string> LinearIndex::getDocumentsForQuery(vector<string> inDoc, vector<string> notInDoc, bool both){

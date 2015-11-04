@@ -93,7 +93,7 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
    //Save the number of documents that have been indexed
    int num = 0;
    for (rapidxml::xml_node<> * document_node = root_node->first_node("page"); document_node; document_node = document_node->next_sibling()){
-      
+
       //The text element of the current document node
       rapidxml::xml_node<> * text;
 
@@ -111,12 +111,31 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
       fileName = fileName + docNameCopy;
       ofstream writeDocFile(fileName);
 
+
       //Add this document to the index and save it's index in the index number-name registry
       int indexOfDoc = index->addDocument(docName);
 
 
       //If we've successfully found a text node for this document
       if(text){
+
+      	 docNameCopy = docName;
+      	 replace(docNameCopy.begin(), docNameCopy.end(), '/', ' ');
+      	 replace(docNameCopy.begin(), docNameCopy.end(), ':', '.');
+      	 stringstream titleStream(docNameCopy);
+
+
+      	 while(!titleStream.eof()){
+
+            //save the current word and add it to the index for the current document number
+         	string word;
+         	titleStream >> word;
+         	writeDocFile << word << " ";
+            //if(/*!isStopWord(word) */!isXMLTag(word)){
+				word[0] = tolower(word[0]);
+            	Porter2Stemmer::stem(word);
+            	index->addWordForDocument(indexOfDoc, word);
+          }
 
          //Make a stringstream of the text element of the document node
          stringstream ss(text->value());

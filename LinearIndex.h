@@ -22,6 +22,9 @@ public:
 	virtual bool writeToFile(string);
 	virtual bool readFromFile(string);
 
+	virtual int numWords();
+	virtual int numDocs();
+
 	void print();
 
 private:

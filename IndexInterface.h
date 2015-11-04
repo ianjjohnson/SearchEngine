@@ -21,6 +21,9 @@ public:
 	virtual bool writeToFile(string) = 0;
 	virtual bool readFromFile(string) = 0;
 
+	virtual int numWords() = 0;
+	virtual int numDocs() = 0;
+
 private:
 	vector<pair<string, int> > documentTitles;
 
