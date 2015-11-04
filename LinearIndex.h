@@ -11,7 +11,6 @@ class LinearIndex : public IndexInterface{
 public:
 	virtual ~LinearIndex();
 
-	virtual bool addDocument(string name, vector<string> relevantWords);
 	virtual int addDocument(string name);
 	virtual bool addWordForDocument(int documentIndex, string word);
 

@@ -9,54 +9,6 @@ LinearIndex::~LinearIndex() {
 
 }
 
-bool LinearIndex::addDocument(string name, vector<string> relevantWords){return true;}
-	/*int indexOfNewDoc = documentTitles.size();
-
-	pair<string, int> doc;
-	doc.first = name;
-	doc.second = relevantWords.size();
-
-	//Add document title to list of titles
-	documentTitles.push_back(doc);
-
-	for(int i = 0; i < relevantWords.size(); i++){
-
-		string word = relevantWords.at(i);
-
-		if(word == "@@@") continue;
-
-		unordered_map< string, vector< pair<int,int> > >::iterator item = index.find(word);
-
-		//If this word hasn't been indexed yet
-		if(item == index.end()){
-
-			vector< pair<int, int > > nums;
-			pair <int, int> defaultEntry;
-			defaultEntry.first = indexOfNewDoc;
-			defaultEntry.second = count(relevantWords.begin(), relevantWords.end(), word);
-			nums.push_back(defaultEntry);
-			pair< string, vector< pair<int, int> > > newItem (word, nums);
-			index.insert(newItem);
-
-		} 
-		//If this word has already been indexed
-		else {
-
-			pair <int, int> defaultEntry;
-			defaultEntry.first = indexOfNewDoc;
-			defaultEntry.second = count(relevantWords.begin(), relevantWords.end(), word);
-			item->second.push_back(defaultEntry);
-		}
-
-		//Mark all duplicate words so they're not added again
-		for(int j = 0; j < relevantWords.size(); j++)
-			if(relevantWords.at(j) == word) relevantWords.at(j) = "@@@";
-
-	}
-
-	return true;
-}*/
-
 /*
 Add a document to the index by document name and returns it's index in the docTitles list
 @param name - the name of the document

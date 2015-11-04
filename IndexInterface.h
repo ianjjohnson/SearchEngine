@@ -10,7 +10,6 @@ class IndexInterface{
 public:
 	virtual ~IndexInterface() {}
 
-	virtual bool addDocument(string name, vector<string> relevantWords) = 0;
 	virtual int addDocument(string name) = 0;
 	virtual bool addWordForDocument(int documentIndex, string word) = 0;
 
