@@ -139,9 +139,7 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
             	Porter2Stemmer::stem(word);
 
 
-            	cout << "About to add title word to index...\n";
             	index->addWordForDocument(indexOfDoc, word);
-            	cout << "Done!\n";
           }
 
          //Make a stringstream of the text element of the document node
@@ -157,9 +155,7 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
             //if(/*!isStopWord(word) */!isXMLTag(word)){
 				word[0] = tolower(word[0]);
             	Porter2Stemmer::stem(word);
-            	cout << "About to add normal word to index...";
-            	index->addWordForDocument(indexOfDoc, word);
-            	cout << "Done!\n";
+            	index->addWordForDocument(indexOfDoc, word);           	
            	}
 
 

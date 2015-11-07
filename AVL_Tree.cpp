@@ -189,18 +189,21 @@ AVLnode<T>* AVLtree<T>::insert(T key) {
  
             bool goLeft = n->key > key;
             n = goLeft ? n->left : n->right;
+
+            AVLnode<T>* toReturn;
  
             if (n == NULL) {
                 if (goLeft) {
                     parent->left = new AVLnode<T>(key, parent);
+                    toReturn = parent->left;
                 }
                 else {
                     parent->right = new AVLnode<T>(key, parent);
+                    toReturn = parent->right;
                 }
  
                 rebalance(parent);
-                return n;
-                break;
+                return toReturn;
             }
         }
     }
@@ -272,13 +275,14 @@ void AVLtree<T>::addDocToWord(string word, int docIndex){
 
 		node->docs.push_back(docIndex);
 	} else {
+
 		AVLnode<T>* newNode = insert(word);
 
 		vector<int> docs;
 		docs.push_back(docIndex);
 		newNode->docs = docs;
-	}
 
+	}
 }
 
 template <class T>
