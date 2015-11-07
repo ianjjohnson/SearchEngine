@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <string>
 #include <vector>
+#include "AVLIndex.h"
 
 using namespace std;
 
@@ -86,7 +87,7 @@ int main(int argc, char* argv[])
    						ind = new LinearIndex();
    						break;
    					case 2 : 
-   						//@TODO ind = new AVLIndex();
+   						ind = new AVLIndex();
    						break;
    					default : 
    						cout << "Damn son you crazy, that number aint cool\n";

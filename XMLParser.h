@@ -9,9 +9,9 @@ using namespace std;
 class XMLParser{
 public:
 	XMLParser(string);
-	bool writeDocToIndex(IndexInterface*);
+	//bool writeDocToIndex(IndexInterface*);
 	bool skipIntroPage();
-	bool readFile(IndexInterface*);
+	//bool readFile(IndexInterface*);
 	bool readFileToIndex(string fileName, IndexInterface* index);
 	bool isXMLTag(string token);
 private:

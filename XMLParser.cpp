@@ -34,7 +34,7 @@ bool XMLParser::isXMLTag(string token){
 Reads a .xml file based on the fileName associated with this XMLParser into an IndexInterface
 @param index - the IndexInterface to load the xml data into
 @return - true if the method succeeded
-*/
+
 bool XMLParser::readFile(IndexInterface* index){
    //The first page of the dump is trash, this skips over it
 	skipIntroPage();
@@ -49,7 +49,7 @@ bool XMLParser::readFile(IndexInterface* index){
 		writeDocToIndex(index);
 	}
 	return true;
-}
+}*/
 
 
 /*
@@ -115,9 +115,10 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
       //Add this document to the index and save it's index in the index number-name registry
       int indexOfDoc = index->addDocument(docName);
 
-
       //If we've successfully found a text node for this document
       if(text){
+
+
 
       	 docNameCopy = docName;
       	 replace(docNameCopy.begin(), docNameCopy.end(), '/', ' ');
@@ -127,14 +128,20 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
 
       	 while(!titleStream.eof()){
 
+
             //save the current word and add it to the index for the current document number
          	string word;
          	titleStream >> word;
          	writeDocFile << word << " ";
+
             //if(/*!isStopWord(word) */!isXMLTag(word)){
 				word[0] = tolower(word[0]);
             	Porter2Stemmer::stem(word);
+
+
+            	cout << "About to add title word to index...\n";
             	index->addWordForDocument(indexOfDoc, word);
+            	cout << "Done!\n";
           }
 
          //Make a stringstream of the text element of the document node
@@ -150,7 +157,9 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
             //if(/*!isStopWord(word) */!isXMLTag(word)){
 				word[0] = tolower(word[0]);
             	Porter2Stemmer::stem(word);
+            	cout << "About to add normal word to index...";
             	index->addWordForDocument(indexOfDoc, word);
+            	cout << "Done!\n";
            	}
 
 
@@ -169,7 +178,7 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
 Write a single document from the xml file into the given index using my own ghetto xml parsing
 @param index - the IndexInterface object to write to
 @return - true if the method ran to completion and filled a document into the index
-*/
+
 bool XMLParser::writeDocToIndex(IndexInterface* index){
 
 
@@ -215,4 +224,4 @@ bool XMLParser::writeDocToIndex(IndexInterface* index){
 	index->addDocument(docName, words);
 
 	return true;
-}
+}*/

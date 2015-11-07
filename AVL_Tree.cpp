@@ -1,339 +1,306 @@
-//==================================================================
-// AVL_Tree.cpp
-// Demonstration of an AVL tree which keeps the tree nodes in as
-//   near perfect balance as possible.
-// Author: Dr. Rick Coleman
-// Date: January 2007
-//==================================================================
-#include "AVL_Tree.h"
+#include <algorithm>
+#include <iostream>
+#include <vector>
+#include <string>
 
 using namespace std;
 
-//------------------------------------------------------------------
-// Default constructor
-//------------------------------------------------------------------
-AVL_Tree::AVL_Tree()
-{
-   root = NULL;   // Initialize root to NULL
-}
+/* AVL node */
+template <class T>
+class AVLnode {
+public:
+    T key;
+    int balance;
+    vector<int> docs;
+    AVLnode *left, *right, *parent;
+ 
+    AVLnode(T k, AVLnode *p) : key(k), balance(0), parent(p),
+                        left(NULL), right(NULL) {}
+ 
+    ~AVLnode() {
+        delete left;
+        delete right;
+    }
+};
+ 
+/* AVL tree */
+template <class T>
+class AVLtree {
+public:
+    AVLtree(void);
+    ~AVLtree(void);
+    AVLnode<T>* insert(T key);
+    void deleteKey(const T key);
+    void printBalance();
 
-//------------------------------------------------------------------
-// Class destructor
-//------------------------------------------------------------------
-AVL_Tree::~AVL_Tree()
-{
-   // Start recursive destruction of tree
-   ClearTree(root);
-}
-
-//------------------------------------------------------------------
-// ClearTree()
-// Recursively delete all node in the tree.
-//------------------------------------------------------------------
-void AVL_Tree::ClearTree(AVLTreeNode *n)
-{
-   if(n != NULL)
-   {
-      ClearTree(n->left);   // Recursively clear the left sub-tree
-      ClearTree(n->right);   // Recursively clear the right sub-tree
-      delete n;         // Delete this node
-   }
-}
-
-//------------------------------------------------------------------
-// Insert()
-// Insert a new node into the tree then restore the AVL property.
-// Assumes that all three pointers (left, right, and parent) have
-//  already been set to NULL in the new node
-//------------------------------------------------------------------
-void AVL_Tree::Insert(AVLTreeNode *newNode)
-{
-   AVLTreeNode *temp, *back, *ancestor;
-
-   temp = root;
-   back = NULL;
-   ancestor = NULL;
-
-   // Check for empty tree first
-   if(root == NULL)
-   {
-      root = newNode;
-      return;
-   }
-   // Tree is not empty so search for place to insert
-   while(temp != NULL) // Loop till temp falls out of the tree 
-   {
-      back = temp;
-      // Mark ancestor that will be out of balance after
-      //   this node is inserted
-      if(temp->balanceFactor != '=')  
-         ancestor = temp;
-      if(newNode->key < temp->key)
-         temp = temp->left;
-      else
-         temp = temp->right;
-   }
-   // temp is now NULL
-   // back points to parent node to attach newNode to
-   // ancestor points to most recent out of balance ancestor
-
-   newNode->parent = back;   // Set parent
-   if(newNode->key < back->key)  // Insert at left
-   {
-      back->left = newNode;
-   }
-   else     // Insert at right
-   {
-      back->right = newNode;
-   }
-
-   // Now call function to restore the tree's AVL property
-   restoreAVL(ancestor, newNode);
-}
-
-//------------------------------------------------------------------
-// restoreAVL() 
-// Restore the AVL quality after inserting a new node.
-// @param ancestor – most recent node back up the tree that is
-//            now out of balance.
-// @param newNode– the newly inserted node.
-//------------------------------------------------------------------
-void AVL_Tree::restoreAVL(AVLTreeNode *ancestor, AVLTreeNode *newNode)
-{
-   //--------------------------------------------------------------------------------
-   // Case 1: ancestor is NULL, i.e. balanceFactor of all ancestors' is '='
-   //--------------------------------------------------------------------------------
-   if(ancestor == NULL)
-   {
-      if(newNode->key < root->key)       // newNode inserted to left of root
-         root->balanceFactor = 'L';
-      else 
-         root->balanceFactor = 'R';   // newNode inserted to right of root
-      // Adjust the balanceFactor for all nodes from newNode back up to root
-      adjustBalanceFactors(root, newNode);
-   }
-
-   //--------------------------------------------------------------------------------
-   // Case 2: Insertion in opposite subtree of ancestor's balance factor, i.e.
-   //  ancestor.balanceFactor = 'L' AND  Insertion made in ancestor's right subtree
-   //     OR
-   //  ancestor.balanceFactor = 'R' AND  Insertion made in ancestor's left subtree
-   //--------------------------------------------------------------------------------
-   else if(((ancestor->balanceFactor == 'L') && (newNode->key > ancestor->key)) ||
-        ((ancestor->balanceFactor == 'R') && (newNode->key < ancestor->key)))
-   {
-      ancestor->balanceFactor = '=';
-      // Adjust the balanceFactor for all nodes from newNode back up to ancestor
-      adjustBalanceFactors(ancestor, newNode);
-   }
-   //--------------------------------------------------------------------------------
-   // Case 3: ancestor.balanceFactor = 'R' and the node inserted is
-   //      in the right subtree of ancestor's right child
-   //--------------------------------------------------------------------------------
-   else if((ancestor->balanceFactor == 'R') && (newNode->key > ancestor->right->key))
-   {
-      ancestor->balanceFactor = '='; // Reset ancestor's balanceFactor
-      rotateLeft(ancestor);       // Do single left rotation about ancestor
-      // Adjust the balanceFactor for all nodes from newNode back up to ancestor's parent
-      adjustBalanceFactors(ancestor->parent, newNode);
-   }
-
-   //--------------------------------------------------------------------------------
-   // Case 4: ancestor.balanceFactor is 'L' and the node inserted is
-   //      in the left subtree of ancestor's left child
-   //--------------------------------------------------------------------------------
-   else if((ancestor->balanceFactor == 'L') && (newNode->key < ancestor->left->key))
-   {
-      ancestor->balanceFactor = '='; // Reset ancestor's balanceFactor
-      rotateRight(ancestor);       // Do single right rotation about ancestor
-      // Adjust the balanceFactor for all nodes from newNode back up to ancestor's parent
-      adjustBalanceFactors(ancestor->parent, newNode);
-   }
-
-   //--------------------------------------------------------------------------------
-   // Case 5: ancestor.balanceFactor is 'L' and the node inserted is
-   //      in the right subtree of ancestor's left child
-   //--------------------------------------------------------------------------------
-   else if((ancestor->balanceFactor == 'L') && (newNode->key > ancestor->left->key))
-   {
-      // Perform double right rotation (actually a left followed by a right)
-      rotateLeft(ancestor->left);
-      rotateRight(ancestor);
-      // Adjust the balanceFactor for all nodes from newNode back up to ancestor
-      adjustLeftRight(ancestor, newNode);
-   }
-
-   //--------------------------------------------------------------------------------
-   // Case 6: ancestor.balanceFactor is 'R' and the node inserted is 
-   //      in the left subtree of ancestor's right child
-   //--------------------------------------------------------------------------------
-   else
-   {
-      // Perform double left rotation (actually a right followed by a left)
-          rotateRight(ancestor->right);
-          rotateLeft(ancestor);
-          adjustRightLeft(ancestor, newNode);
-   }
-}
-
-//------------------------------------------------------------------
-// Adjust the balance factor in all nodes from the inserted node's
-//   parent back up to but NOT including a designated end node.
-// @param end– last node back up the tree that needs adjusting
-// @param start – node just inserted 
-//------------------------------------------------------------------
-void AVL_Tree::adjustBalanceFactors(AVLTreeNode *end, AVLTreeNode *start)
-{
-    AVLTreeNode *temp = start->parent; // Set starting point at start's parent
-    while(temp != end)
-    {
-        if(start->key < temp->key)
-            temp->balanceFactor = 'L';
+    vector<int> getDocsForWord(string word);
+    void addDocToWord(string word, int docIndex);
+    AVLnode<T>* search(string word);
+ 
+private:
+    AVLnode<T> *root;
+ 
+    AVLnode<T>* rotateLeft          ( AVLnode<T> *a );
+    AVLnode<T>* rotateRight         ( AVLnode<T> *a );
+    AVLnode<T>* rotateLeftThenRight ( AVLnode<T> *n );
+    AVLnode<T>* rotateRightThenLeft ( AVLnode<T> *n );
+    void rebalance                  ( AVLnode<T> *n );
+    int height                      ( AVLnode<T> *n );
+    void setBalance                 ( AVLnode<T> *n );
+    void printBalance               ( AVLnode<T> *n );
+    void clearNode                  ( AVLnode<T> *n );
+};
+ 
+/* AVL class definition */
+template <class T>
+void AVLtree<T>::rebalance(AVLnode<T> *n) {
+    setBalance(n);
+ 
+    if (n->balance == -2) {
+        if (height(n->left->left) >= height(n->left->right))
+            n = rotateRight(n);
         else
-            temp->balanceFactor = 'R';
-        temp = temp->parent;
-    } // end while
-}
-
-//------------------------------------------------------------------
-// rotateLeft()
-// Perform a single rotation left about n.  This will rotate n's
-//   parent to become n's left child.  Then n's left child will
-//   become the former parent's right child.
-//------------------------------------------------------------------
-void AVL_Tree::rotateLeft(AVLTreeNode *n)
-{
-   AVLTreeNode *temp = n->right;   //Hold pointer to n's right child
-   n->right = temp->left;      // Move temp 's left child to right child of n
-   if(temp->left != NULL)      // If the left child does exist
-      temp ->left->parent = n;// Reset the left child's parent
-   if(n->parent == NULL)       // If n was the root
-   {
-      root = temp;      // Make temp the new root
-      temp->parent = NULL;   // Root has no parent
-   }
-   else if(n->parent->left == n) // If n was the left child of its' parent
-      n->parent->left = temp;   // Make temp the new left child
-   else               // If n was the right child of its' parent
-      n->parent->right = temp;// Make temp the new right child
-
-   temp->left = n;         // Move n to left child of temp
-   n->parent = temp;         // Reset n's parent
-}
-
-//------------------------------------------------------------------
-// rotateRight()
-// Perform a single rotation right about n.  This will rotate n's
-//   parent to become n's right child.  Then n's right child will
-//   become the former parent's left child.
-//------------------------------------------------------------------
-void AVL_Tree::rotateRight(AVLTreeNode *n)
-{
-   AVLTreeNode *temp = n->left;   //Hold pointer to temp
-   n->left = temp->right;      // Move temp's right child to left child of n
-   if(temp->right != NULL)      // If the right child does exist
-      temp->right->parent = n;// Reset right child's parent
-   if(n->parent == NULL)       // If n was root
-   {
-      root = temp;      // Make temp the root
-      temp->parent = NULL;   // Root has no parent
-   }
-   else if(n->parent->left == n) // If was the left child of its' parent
-      n->parent->left = temp;   // Make temp the new left child
-   else               // If n was the right child of its' parent
-      n->parent->right = temp;// Make temp the new right child
-
-   temp->right = n;         // Move n to right child of temp
-   n->parent = temp;         // Reset n's parent
-}
-
-//------------------------------------------------------------------
-// adjustLeftRight()
-// @param end- last node back up the tree that needs adjusting
-// @param start - node just inserted 
-//------------------------------------------------------------------
-void AVL_Tree::adjustLeftRight(AVLTreeNode *end, AVLTreeNode *start)
-{
-    if(end == root)
-        end->balanceFactor = '=';
-    else if(start->key < end->parent->key)
-    {
-        end->balanceFactor = 'R';
-        adjustBalanceFactors(end->parent->left, start);
+            n = rotateLeftThenRight(n);
     }
-    else
-    {
-        end->balanceFactor = '=';
-        end->parent->left->balanceFactor = 'L';
-        adjustBalanceFactors(end, start);
+    else if (n->balance == 2) {
+        if (height(n->right->right) >= height(n->right->left))
+            n = rotateLeft(n);
+        else
+            n = rotateRightThenLeft(n);
+    }
+ 
+    if (n->parent != NULL) {
+        rebalance(n->parent);
+    }
+    else {
+        root = n;
     }
 }
-
-//------------------------------------------------------------------
-// adjustRightLeft
-// @param end- last node back up the tree that needs adjusting
-// @param start - node just inserted 
-//------------------------------------------------------------------
-void AVL_Tree::adjustRightLeft(AVLTreeNode *end, AVLTreeNode *start)
-{
-    if(end == root)
-        end->balanceFactor = '=';
-    else if(start->key > end->parent->key)
-    {
-        end->balanceFactor = 'L';
-        adjustBalanceFactors(end->parent->right, start);
+ 
+template <class T>
+AVLnode<T>* AVLtree<T>::rotateLeft(AVLnode<T> *a) {
+    AVLnode<T> *b = a->right;
+    b->parent = a->parent;
+    a->right = b->left;
+ 
+    if (a->right != NULL)
+        a->right->parent = a;
+ 
+    b->left = a;
+    a->parent = b;
+ 
+    if (b->parent != NULL) {
+        if (b->parent->right == a) {
+            b->parent->right = b;
+        }
+        else {
+            b->parent->left = b;
+        }
     }
-    else
-    {
-        end->balanceFactor = '=';
-        end->parent->right->balanceFactor = 'R';
-        adjustBalanceFactors(end, start);
+ 
+    setBalance(a);
+    setBalance(b);
+    return b;
+}
+ 
+template <class T>
+AVLnode<T>* AVLtree<T>::rotateRight(AVLnode<T> *a) {
+    AVLnode<T> *b = a->left;
+    b->parent = a->parent;
+    a->left = b->right;
+ 
+    if (a->left != NULL)
+        a->left->parent = a;
+ 
+    b->right = a;
+    a->parent = b;
+ 
+    if (b->parent != NULL) {
+        if (b->parent->right == a) {
+            b->parent->right = b;
+        }
+        else {
+            b->parent->left = b;
+        }
+    }
+ 
+    setBalance(a);
+    setBalance(b);
+    return b;
+}
+ 
+template <class T>
+AVLnode<T>* AVLtree<T>::rotateLeftThenRight(AVLnode<T> *n) {
+    n->left = rotateLeft(n->left);
+    return rotateRight(n);
+}
+ 
+template <class T>
+AVLnode<T>* AVLtree<T>::rotateRightThenLeft(AVLnode<T> *n) {
+    n->right = rotateRight(n->right);
+    return rotateLeft(n);
+}
+ 
+template <class T>
+int AVLtree<T>::height(AVLnode<T> *n) {
+    if (n == NULL)
+        return -1;
+    return 1 + std::max(height(n->left), height(n->right));
+}
+ 
+template <class T>
+void AVLtree<T>::setBalance(AVLnode<T> *n) {
+    n->balance = height(n->right) - height(n->left);
+}
+ 
+template <class T>
+void AVLtree<T>::printBalance(AVLnode<T> *n) {
+    if (n != NULL) {
+        printBalance(n->left);
+        std::cout << n->balance << " ";
+        printBalance(n->right);
     }
 }
-
-//------------------------------------------------------------------
-// PrintTree()
-// Intiate a recursive traversal to print the tree
-//------------------------------------------------------------------
-void AVL_Tree::PrintTree()
-{
-   cout << "\nPrinting the tree...\n";
-   cout << "Root Node: " << root->key << " balanceFactor is " <<
-      root->balanceFactor << "\n\n";
-   Print(root);
+ 
+template <class T>
+AVLtree<T>::AVLtree(void) : root(NULL) {}
+ 
+template <class T>
+AVLtree<T>::~AVLtree(void) {
+    delete root;
+}
+ 
+template <class T>
+AVLnode<T>* AVLtree<T>::insert(T key) {
+    if (root == NULL) {
+        root = new AVLnode<T>(key, NULL);
+        return root;
+    }
+    else {
+        AVLnode<T>
+            *n = root,
+            *parent;
+ 
+        while (true) {
+            if (n->key == key)
+                return nullptr;
+ 
+            parent = n;
+ 
+            bool goLeft = n->key > key;
+            n = goLeft ? n->left : n->right;
+ 
+            if (n == NULL) {
+                if (goLeft) {
+                    parent->left = new AVLnode<T>(key, parent);
+                }
+                else {
+                    parent->right = new AVLnode<T>(key, parent);
+                }
+ 
+                rebalance(parent);
+                return n;
+                break;
+            }
+        }
+    }
+ 
+    return nullptr;
+}
+ 
+template <class T>
+void AVLtree<T>::deleteKey(const T delKey) {
+    if (root == NULL)
+        return;
+ 
+    AVLnode<T>
+        *n       = root,
+        *parent  = root,
+        *delNode = NULL,
+        *child   = root;
+ 
+    while (child != NULL) {
+        parent = n;
+        n = child;
+        child = delKey >= n->key ? n->right : n->left;
+        if (delKey == n->key)
+            delNode = n;
+    }
+ 
+    if (delNode != NULL) {
+        delNode->key = n->key;
+ 
+        child = n->left != NULL ? n->left : n->right;
+ 
+        if (root->key == delKey) {
+            root = child;
+        }
+        else {
+            if (parent->left == n) {
+                parent->left = child;
+            }
+            else {
+                parent->right = child;
+            }
+ 
+            rebalance(parent);
+        }
+    }
+}
+ 
+template <class T>
+void AVLtree<T>::printBalance() {
+    printBalance(root);
+    std::cout << std::endl;
 }
 
-//------------------------------------------------------------------
-// Print()
-// Perform a recursive traversal to print the tree
-//------------------------------------------------------------------
-void AVL_Tree::Print(AVLTreeNode *n)
-{
-   if(n != NULL)
-   {
-      cout<<"Node: " << n->key << " balanceFactor is " <<
-         n->balanceFactor << "\n";
-      if(n->left != NULL)
-      {
-         cout<<"\t moving left\n";
-         Print(n->left);
-         cout<<"Returning to Node" << n->key << " from its' left subtree\n";
-      }
-      else
-      {
-         cout<<"\t left subtree is empty\n";
-      }
-      cout<<"Node: " << n->key << " balanceFactor is " <<
-         n->balanceFactor << "\n";
-      if(n->right != NULL)
-      {
-         cout<<"\t moving right\n";
-         Print(n->right);
-         cout<<"Returning to Node" << n->key << " from its' right subtree\n";
-      }
-      else
-      {
-         cout<<"\t right subtree is empty\n";
-      }
-   }
+template <class T>
+vector<int> AVLtree<T>::getDocsForWord(string word){
+	AVLnode<T>* node = search(word);
+	vector<int> docs;
+	if(node != nullptr){
+		docs = node->docs;
+	}
+	return docs;
 }
+
+template <class T>
+void AVLtree<T>::addDocToWord(string word, int docIndex){
+	AVLnode<T>* node = search(word);
+
+	if(node != nullptr){
+
+		node->docs.push_back(docIndex);
+	} else {
+		AVLnode<T>* newNode = insert(word);
+
+		vector<int> docs;
+		docs.push_back(docIndex);
+		newNode->docs = docs;
+	}
+
+}
+
+template <class T>
+AVLnode<T>* AVLtree<T>::search(string word){
+	AVLnode<T>* curr = root;
+	while(curr != nullptr && curr->key != word){
+		if(curr->key > word){
+			if(curr->left != nullptr){
+				curr = curr->left;
+				continue;
+			} else {
+				return nullptr;
+			}
+		} else if(curr->key < word){
+			if(curr->right != nullptr){
+				curr = curr->right;
+				continue;
+			} else {
+				return nullptr;
+			}
+		}
+	} 
+	return curr;
+}
+

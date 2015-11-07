@@ -8,12 +8,16 @@
 #define AVL_TREE_H
 
 #include <iostream>
+#include <vector>
+#include <string>
 using namespace std;
 
 struct AVLTreeNode
 {
-   int key;
-   // Other data fields can be inserted here
+   string key;
+
+   vector<int> docs;
+
    AVLTreeNode *left;
    AVLTreeNode *right;
    AVLTreeNode *parent;
@@ -36,6 +40,9 @@ class AVL_Tree
       void adjustLeftRight(AVLTreeNode *end, AVLTreeNode *start);
       void adjustRightLeft(AVLTreeNode *end, AVLTreeNode *start);
       void PrintTree();
+      vector<int> getDocsForWord(string word);
+      void addDocToWord(string word, int docIndex);
+      AVLTreeNode* find(string word);
    private:
       void ClearTree(AVLTreeNode *n);
       void Print(AVLTreeNode *n);
