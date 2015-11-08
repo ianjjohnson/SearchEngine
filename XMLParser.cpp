@@ -7,7 +7,15 @@
 XMLParser::XMLParser(string fileName){
 	is.open(fileName);
 
-	cout << "File opened!\n";
+	ifstream getStopWords("stopwords.txt");
+	string token = "";
+
+	while(token != "<-1>"){
+		getStopWords >> token;
+		for(int i = 0; i < token.size(); i++)
+			token[i] = tolower(token[i]);
+		stopWords.push_back(token);
+	}
 }
 
 bool XMLParser::isXMLTag(string token){
@@ -28,6 +36,26 @@ bool XMLParser::isXMLTag(string token){
       || token.find("\'") != string::npos
       || token.find("}") != string::npos
       || token.find("{") != string::npos;
+}
+
+/*
+Checks if a given token is a stop word
+@param token - the word to compare to all the stop words
+@return - true if the token is a stop word
+*/
+bool XMLParser::isStopWord(string token){
+
+   //send token to lower case
+   for(int i = 0; i < token.size(); i++){
+         token[i] = tolower(token[i]);
+   }
+
+
+   //For every stop word, check if it's a match
+   for(int i = 0; i < stopWords.size(); i++){
+      if(token == stopWords.at(i)) return true;
+   }
+   return false;
 }
 
 /*
@@ -78,7 +106,7 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
 	rapidxml::xml_document<> doc;
    rapidxml::xml_node<> * root_node;
    ifstream theFile (fileName);
-   
+
    vector<char> buffer((istreambuf_iterator<char>(theFile)), istreambuf_iterator<char>());
    buffer.push_back('\0');
    // Parse the buffer using the xml file parsing library into doc 
@@ -148,11 +176,12 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
          	string word;
          	ss >> word;
          	writeDocFile << word << " ";
-            //if(/*!isStopWord(word) */!isXMLTag(word)){
+            if(!isStopWord(word) && !isXMLTag(word)){
 				word[0] = tolower(word[0]);
             	Porter2Stemmer::stem(word);
             	index->addWordForDocument(indexOfDoc, word);           	
            	}
+         }
 
 
        }
@@ -160,7 +189,7 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
 
        writeDocFile.close();
        cout << num++ << docName << endl;
-   }
+	}
 
    return true;
 }

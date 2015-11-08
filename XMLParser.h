@@ -16,4 +16,7 @@ public:
 	bool isXMLTag(string token);
 private:
 	ifstream is;
+	//The stop words to ignore in search
+	vector<string> stopWords;
+	bool isStopWord(string token);
 };
