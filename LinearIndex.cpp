@@ -100,15 +100,11 @@ vector<string> LinearIndex::getDocumentsForWord(string word){
 		}
 	}
 
-	cout << "About to make title vector for word "<< word <<  "\n";
-
 	vector<string> titleVector;
 
 	for(map<int, string>::iterator it = titles.begin(); it != titles.end(); ++it)
 		if(find(titleVector.begin(), titleVector.end(), it->second) == titleVector.end())
 			titleVector.push_back(it->second);
-
-	cout << "Made title vector\n";
 
 	return titleVector;
 }

@@ -28,6 +28,7 @@ class AVL_Tree
 {
    private:
       AVLTreeNode   *root;
+      
 
    public:
       AVL_Tree();            // Constructor

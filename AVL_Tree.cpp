@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <fstream>
 
 using namespace std;
 
@@ -36,6 +37,9 @@ public:
     vector<int> getDocsForWord(string word);
     void addDocToWord(string word, int docIndex);
     AVLnode<T>* search(string word);
+    int getNumWords();
+
+    void postorderFileWrite(ofstream*);
  
 private:
     AVLnode<T> *root;
@@ -49,6 +53,9 @@ private:
     void setBalance                 ( AVLnode<T> *n );
     void printBalance               ( AVLnode<T> *n );
     void clearNode                  ( AVLnode<T> *n );
+    void postorder 					( AVLnode<T> *curr, ofstream* os);
+
+    int numWords;
 };
  
 /* AVL class definition */
@@ -79,6 +86,9 @@ void AVLtree<T>::rebalance(AVLnode<T> *n) {
  
 template <class T>
 AVLnode<T>* AVLtree<T>::rotateLeft(AVLnode<T> *a) {
+
+	//cout << "Rotating Left\n";
+
     AVLnode<T> *b = a->right;
     b->parent = a->parent;
     a->right = b->left;
@@ -105,6 +115,9 @@ AVLnode<T>* AVLtree<T>::rotateLeft(AVLnode<T> *a) {
  
 template <class T>
 AVLnode<T>* AVLtree<T>::rotateRight(AVLnode<T> *a) {
+
+	//cout << "Rotating Right\n";
+
     AVLnode<T> *b = a->left;
     b->parent = a->parent;
     a->left = b->right;
@@ -131,12 +144,18 @@ AVLnode<T>* AVLtree<T>::rotateRight(AVLnode<T> *a) {
  
 template <class T>
 AVLnode<T>* AVLtree<T>::rotateLeftThenRight(AVLnode<T> *n) {
+
+	//cout << "Rotating Left-Right\n";
+
     n->left = rotateLeft(n->left);
     return rotateRight(n);
 }
  
 template <class T>
 AVLnode<T>* AVLtree<T>::rotateRightThenLeft(AVLnode<T> *n) {
+
+	//cout << "Rotating Right-Left\n";
+
     n->right = rotateRight(n->right);
     return rotateLeft(n);
 }
@@ -163,7 +182,9 @@ void AVLtree<T>::printBalance(AVLnode<T> *n) {
 }
  
 template <class T>
-AVLtree<T>::AVLtree(void) : root(NULL) {}
+AVLtree<T>::AVLtree(void) : root(NULL) {
+	numWords = 0;
+}
  
 template <class T>
 AVLtree<T>::~AVLtree(void) {
@@ -203,6 +224,7 @@ AVLnode<T>* AVLtree<T>::insert(T key) {
                 }
  
                 rebalance(parent);
+                numWords++;
                 return toReturn;
             }
         }
@@ -281,7 +303,6 @@ void AVLtree<T>::addDocToWord(string word, int docIndex){
 		vector<int> docs;
 		docs.push_back(docIndex);
 		newNode->docs = docs;
-
 	}
 }
 
@@ -306,5 +327,28 @@ AVLnode<T>* AVLtree<T>::search(string word){
 		}
 	} 
 	return curr;
+}
+
+template<class T>
+int AVLtree<T>::getNumWords(){
+	return numWords;
+}
+
+template<class T>
+void AVLtree<T>::postorderFileWrite(ofstream* os){
+	postorder(root, os);
+}
+
+template<class T>
+void AVLtree<T>::postorder(AVLnode<T>* curr, ofstream* os){
+	if(curr == nullptr) return;
+	postorder(curr->left, os);
+	postorder(curr->right, os);
+
+	*os << curr->key;
+	for(int i = 0; i < curr->docs.size(); i++){
+			*os << " " << curr->docs.at(i) << " ";  
+	}
+	*os << " <3>\n";
 }
 

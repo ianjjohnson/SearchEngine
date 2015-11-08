@@ -78,17 +78,13 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
 	rapidxml::xml_document<> doc;
    rapidxml::xml_node<> * root_node;
    ifstream theFile (fileName);
-
-   cout << "loaded the file\n";
-
+   
    vector<char> buffer((istreambuf_iterator<char>(theFile)), istreambuf_iterator<char>());
    buffer.push_back('\0');
    // Parse the buffer using the xml file parsing library into doc 
    doc.parse<0>(&buffer[0]);
    // Find our root node
    root_node = doc.first_node("mediawiki");
-
-   cout << "found root node\n";
 
    //Save the number of documents that have been indexed
    int num = 0;
