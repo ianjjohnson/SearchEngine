@@ -103,7 +103,7 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
    This is a block of setup code for rapidxml so that I can parse through the xml file efficiently
    */
 
-	rapidxml::xml_document<> doc;
+ 	rapidxml::xml_document<> doc;
    rapidxml::xml_node<> * root_node;
    ifstream theFile (fileName);
 
@@ -124,9 +124,22 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
       //Grab the text and document name of the current document
       text = document_node->first_node("revision")->first_node("text");
       string docName = document_node->first_node("title")->value();
-      
+
       //Ignore documents called user or file. They're garbage
       if(docName.substr(0, 4) == "User" || docName.substr(0,4) == "File") continue;
+
+      string docAuthor;
+      if(document_node->first_node("revision")->first_node("contributor") != nullptr
+      	&& document_node->first_node("revision")->first_node("contributor")->first_node("username") != nullptr)
+     	 docAuthor = document_node->first_node("revision")->first_node("contributor")->first_node("username")->value();
+      else
+      	docAuthor = "No author information given";
+
+      string timestamp;
+      if(document_node->first_node("revision")->first_node("timestamp") != nullptr)
+      	timestamp = document_node->first_node("revision")->first_node("timestamp")->value();
+      else
+      	timestamp = "No timestamp given";
 
       string fileName = "SearchDocs/";
       string docNameCopy = docName;
@@ -137,7 +150,7 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
 
 
       //Add this document to the index and save it's index in the index number-name registry
-      int indexOfDoc = index->addDocument(docName);
+      int indexOfDoc = index->addDocument(docName, docAuthor, timestamp);
 
       //If we've successfully found a text node for this document
       if(text){

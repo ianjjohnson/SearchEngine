@@ -12,7 +12,7 @@ class AVLIndex : public IndexInterface{
 public:
 	virtual ~AVLIndex();
 
-	virtual int addDocument(string name);
+	virtual int addDocument(string name, string author, string date);
 	virtual bool addWordForDocument(int documentIndex, string word);
 
 	virtual vector<string> getDocumentsForWord(string word);
@@ -25,8 +25,11 @@ public:
 	virtual int numWords();
 	virtual int numDocs();
 
+	virtual pair<string, string> getAuthorAndTimeForDocNamed(string name);
+
 private:
 	vector<pair<string, int> > documentTitles;
+	map<string, pair<string, string> > authorsAndDates;
 	AVLtree<string> index;
 
 };

@@ -11,7 +11,7 @@
 AVLIndex::~AVLIndex(){
 }
 
-int AVLIndex::addDocument(string name){
+int AVLIndex::addDocument(string name, string author, string date){
 
 	int indexOfNewDoc = documentTitles.size();
 
@@ -21,6 +21,16 @@ int AVLIndex::addDocument(string name){
 
 	//Add document title to list of titles
 	documentTitles.push_back(doc);
+
+	pair<string, string> authorDate;
+	authorDate.first = author;
+	authorDate.second = date;
+
+	pair<string, pair<string, string> > mapItem;
+	mapItem.first = name;
+	mapItem.second = authorDate;
+
+	authorsAndDates.insert(mapItem);
 
 
 	return documentTitles.size()-1;
@@ -72,7 +82,9 @@ bool AVLIndex::sortComparator(int, int, vector<string>){
 bool AVLIndex::writeToFile(string fileName){
 	ofstream os(fileName);
 	for(int i = 0; i < documentTitles.size(); i++){
-		os << documentTitles.at(i).first << " <1> "  << documentTitles.at(i).second << endl;
+		map<string, pair<string, string> >::iterator authorTime = authorsAndDates.find(documentTitles.at(i).first);
+
+		os << documentTitles.at(i).first << " <1> "  << documentTitles.at(i).second << " " << authorTime->second.first << " <1c> " << authorTime->second.second << endl;
 	}
 	os << "<2>" << endl;
 
@@ -87,21 +99,49 @@ bool AVLIndex::readFromFile(string fileName){
 	ifstream is(fileName);
 	string token;
 	string name = "";
+	string author = "";
+	string date = "";
 
 	while(is.is_open()){
+
+		while(token != "<1>"){
+			name += " " + token;
+			is >> token;
+		} 
+
+		name.erase(0,1);
+
+		string num;
+		is >> num;
+		pair<string, int> item;
+		item.first = name;
+		item.second = atoi(num.c_str());
+		documentTitles.push_back(item);
+		
 		is >> token;
 
-		if(token != "<1>"){
-			name += " " + token;
-		} else {
-			string num;
-			is >> num;
-			pair<string, int> item;
-			item.first = name;
-			item.second = atoi(num.c_str());
-			documentTitles.push_back(item);
-			name = "";
-		}
+		while(token != "<1c>"){
+			author += " " + token;
+			is >> token;
+		} 
+		
+		is >> date; 
+
+		pair<string, string> authorAndDate;
+		authorAndDate.first = author;
+		authorAndDate.second = date;
+
+		pair<string, pair<string, string> > mapItem;
+		mapItem.first = name;
+		mapItem.second = authorAndDate;
+
+		authorsAndDates.insert(mapItem);
+
+		name = "";
+		author = "";
+		date = "";
+		
+		is >> token;
 
 		if(token == "<2>") break;
 	}
@@ -116,7 +156,6 @@ bool AVLIndex::readFromFile(string fileName){
 			string num;
 			is >> num;
 			if(num == "<3>"){
-				cout << "End of doc\n";
 				AVLnode<string>* newNode = index.insert(name);
 				newNode->docs = nums;
 				break;
@@ -134,4 +173,9 @@ int AVLIndex::numWords(){
 
 int AVLIndex::numDocs(){
 	return documentTitles.size();
+}
+
+pair<string, string> AVLIndex::getAuthorAndTimeForDocNamed(string name){
+	map<string, pair<string, string> >::iterator authorTime = authorsAndDates.find(name);
+	return authorTime->second;
 }

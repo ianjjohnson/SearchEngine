@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 using namespace std;
 
@@ -10,7 +11,7 @@ class IndexInterface{
 public:
 	virtual ~IndexInterface() {}
 
-	virtual int addDocument(string name) = 0;
+	virtual int addDocument(string name, string author, string date) = 0;
 	virtual bool addWordForDocument(int documentIndex, string word) = 0;
 
 	virtual vector<string> getDocumentsForWord(string word)= 0;
@@ -23,8 +24,11 @@ public:
 	virtual int numWords() = 0;
 	virtual int numDocs() = 0;
 
+	virtual pair<string, string> getAuthorAndTimeForDocNamed(string name) = 0;
+
 private:
 	vector<pair<string, int> > documentTitles;
+	map<string, pair<string, string> > authorsAndDates;
 
 };
 

@@ -1,6 +1,6 @@
 #include <iostream>
 #include <sstream>
-#include "LinearIndex.h"
+#include "HashIndex.h"
 #include "XMLParser.h"
 #include "QueryHandler.h"
 #include <algorithm>
@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
    				cin >> typeSelection;
    				switch(typeSelection){
    					case 1 : 
-   						ind = new LinearIndex();
+   						ind = new HashIndex();
    						break;
    					case 2 : 
    						ind = new AVLIndex();
