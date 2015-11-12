@@ -184,8 +184,11 @@ void QueryHandler::doSearch(vector<string> words){
 	}
 
 
-	for(int i = 0; i < outputFromSearch.size(); i++)
+	for(int i = 0; i < outputFromSearch.size(); i++){
          cout << "Document #" << i << " " << outputFromSearch.at(i) << endl;
+         pair<string, string> authTime = ind->getAuthorAndTimeForDocNamed(outputFromSearch.at(i));
+         cout << "Author: " << authTime.first << ", Timestamp: " << authTime.second << "\n";
+    }
 
     
     cout << "If you'd like to see a doc, type in its number, or else type -1\n";
