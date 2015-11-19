@@ -284,119 +284,210 @@ void AVLTree<T>::rebalance(AVLNode<T> *curr) {
         root = curr;
     }
 }
- 
+
+/*
+Inserts a new node into the tree with key 'key'
+@param key - they key for the new node
+@return - a pointer to the new node after insertion
+*/ 
 template <class T>
 AVLNode<T>* AVLTree<T>::insert(T key) {
+
+	//Empty case
     if (root == nullptr) {
         root = new AVLNode<T>(key, nullptr);
         return root;
     }
+
+    //Not empty case
     else {
-        AVLNode<T>
-            *n = root,
-            *parent;
+        AVLNode<T> *curr = root;
+        AVLNode<T> *parent;
  
         while (true) {
-            if (n->key == key)
-                return nullptr;
- 
-            parent = n;
- 
-            bool goLeft = n->key > key;
-            n = goLeft ? n->leftChild : n->rightChild;
 
-            AVLNode<T>* toReturn;
+        	//If a node has been found with this key, don't do anything and return a nullptr
+            if (curr->key == key)
+                return nullptr;
+ 			
+ 			//Save parent
+            parent = curr;
  
-            if (n == nullptr) {
-                if (goLeft) {
+            bool direction = curr->key > key; //True if current value is greater than input key value
+            curr = direction ? curr->leftChild : curr->rightChild; //Move left or right down the tree based on above decision
+ 			
+            //If we found a leaf, insert!
+            if (curr == nullptr) {
+
+            	//Save the new node which is made for later access
+            	AVLNode<T>* toReturn;
+
+            	//If we went left
+                if (direction) {
+
+                	//Make the parent's left child a new node and save a pointer to it
                     parent->leftChild = new AVLNode<T>(key, parent);
                     toReturn = parent->leftChild;
                 }
+
+                //If we went right
                 else {
+
+                	//Make the parent's left child a new node and save a pointer to it
                     parent->rightChild = new AVLNode<T>(key, parent);
                     toReturn = parent->rightChild;
                 }
  
+ 				//Rebalance to maintain AVL property
                 rebalance(parent);
+
+                //Save an increase in number of words indexed
                 numWords++;
+
+                //Return a pointer to the new item
                 return toReturn;
             }
         }
     }
- 
+ 	//Return nullptr by default (this shouldn't ever actually get executed)
     return nullptr;
 }
 
+/*
+Get a list of the document numbers for docs which contain word 'word'
+@param word - the word to look up in the index
+@return - a list of doc numbers for docs containing word
+*/
 template <class T>
 vector<int> AVLTree<T>::getDocsForWord(string word){
+	//Search for the word
 	AVLNode<T>* node = search(word);
 	vector<int> docs;
+
+	//If the word was indexed, copy over it's documents
 	if(node != nullptr){
 		docs = node->docs;
 	}
 	return docs;
 }
 
+/*
+Register that a certain document contains a certain word
+@param word - the word being indexed
+@param docIndex - the index of the document that contains word
+*/
 template <class T>
 void AVLTree<T>::addDocToWord(string word, int docIndex){
+	//Search for the word
 	AVLNode<T>* node = search(word);
 
+	//If the word was in the index, add the docIndex to its docs vector
 	if(node != nullptr){
 
 		node->docs.push_back(docIndex);
-	} else {
+	} 
+	//If the word is new for the index
+	else {
 
+		//Build a new node and put it in the tree
 		AVLNode<T>* newNode = insert(word);
 
+		//Build a vector with the doc index and add it to the word node
 		vector<int> docs;
 		docs.push_back(docIndex);
 		newNode->docs = docs;
 	}
 }
 
+/*
+Search the AVL tree using iterative BST search
+@param word - the word (key) to search for -- this could be a T (templated) but nah
+@return - a pointer to the node whose key value is word if found, or nullptr
+*/
 template <class T>
 AVLNode<T>* AVLTree<T>::search(string word){
+
+	//Start at the root
 	AVLNode<T>* curr = root;
+
+	//While in tree and no match
 	while(curr != nullptr && curr->key != word){
+
+		//Case go left
 		if(curr->key > word){
+
+			//If there's a left child, go left
 			if(curr->leftChild != nullptr){
 				curr = curr->leftChild;
 				continue;
-			} else {
+			} 
+			//If there's no left child, no match in tree
+			else {
 				return nullptr;
 			}
-		} else if(curr->key < word){
+
+		} 
+		//Case go right
+		else if(curr->key < word){
+
+			//If there's a right child, go right
 			if(curr->rightChild != nullptr){
 				curr = curr->rightChild;
 				continue;
-			} else {
+			} 
+			//If there's no right child, no match in tree
+			else {
 				return nullptr;
 			}
 		}
 	} 
+	//Either found a match or nullptr, return it (if this line is reached, it's a match unless the tree is empty)
 	return curr;
 }
 
+/*
+Getter for the number of words indexed by the AVL tree
+@return - the number of nodes in the AVL tree (precalculated)
+*/
 template<class T>
 int AVLTree<T>::getNumWords(){
 	return numWords;
 }
 
+/*
+Public interface method for a postorder file output traversal of the tree
+@param os - the ofstream to write to
+*/
 template<class T>
 void AVLTree<T>::postorderFileWrite(ofstream* os){
+	//Make a recursive call from the root
 	postorder(root, os);
 }
 
+/*
+Private recursive method for a postorder file output traversal of the tree
+@param curr - the current node
+@param os - the ofstream to write to
+*/
 template<class T>
 void AVLTree<T>::postorder(AVLNode<T>* curr, ofstream* os){
+
+	//Base case
 	if(curr == nullptr) return;
+
+	//Depth-first, fam (recursive call)
 	postorder(curr->leftChild, os);
 	postorder(curr->rightChild, os);
 
+	//write out the word name
 	*os << curr->key;
+
+	//Write out the doc indeces of all docs containing this word
 	for(int i = 0; i < curr->docs.size(); i++){
 			*os << " " << curr->docs.at(i) << " ";  
 	}
+
+	//Write out word delimiter 3
 	*os << " <3>\n";
 }
 
