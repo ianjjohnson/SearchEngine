@@ -30,7 +30,7 @@ public:
 private:
 	vector<pair<string, int> > documentTitles;
 	map<string, pair<string, string> > authorsAndDates;
-	AVLtree<string> index;
+	AVLTree<string> index;
 
 };
 

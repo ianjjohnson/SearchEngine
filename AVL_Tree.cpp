@@ -6,199 +6,293 @@
 
 using namespace std;
 
-/* AVL node */
+/*
+A quick note:
+I decided to go with the strategy of every node having a pointer to its parent and a saved
+balance value for ease of use.
+I know this is not the most efficient approach, but it's how I learned it originally
+and I find it to be a little easier to intuitize this way
+*/
+
+/*
+Templatable, but it's only ever a string in this case
+*/
 template <class T>
-class AVLnode {
+class AVLNode {
 public:
+
+	//Key value to use as binary search tree comparator
     T key;
+
+    //Balance factor
     int balance;
+
+    //The list of documents which contain this node/word
     vector<int> docs;
-    AVLnode *left, *right, *parent;
+
+
+    AVLNode *leftChild;
+    AVLNode *rightChild;
+
+    AVLNode *parent;
  
-    AVLnode(T k, AVLnode *p) : key(k), balance(0), parent(p),
-                        left(NULL), right(NULL) {}
+ 	//Constructor which takes a parent and a key
+    AVLNode(T k, AVLNode *p){
+    	leftChild = nullptr;
+    	rightChild = nullptr;
+    	key = k;
+    	balance = 0;
+    	parent = p;
+    }
  
-    ~AVLnode() {
-        delete left;
-        delete right;
+ 	//Destructor automatically recursively calls children destructors. Seems rude, but so it goes
+    ~AVLNode() {
+        delete leftChild;
+        delete rightChild;
     }
 };
  
-/* AVL tree */
+//Also templatable, but always used with a string
 template <class T>
-class AVLtree {
+class AVLTree {
+
 public:
-    AVLtree(void);
-    ~AVLtree(void);
-    AVLnode<T>* insert(T key);
-    void deleteKey(const T key);
-    void printBalance();
+
+    AVLTree();
+    ~AVLTree();
+    AVLNode<T>* insert(T key);
 
     vector<int> getDocsForWord(string word);
     void addDocToWord(string word, int docIndex);
-    AVLnode<T>* search(string word);
+    AVLNode<T>* search(string word);
     int getNumWords();
 
     void postorderFileWrite(ofstream*);
  
 private:
-    AVLnode<T> *root;
+    AVLNode<T> *root;
  
-    AVLnode<T>* rotateLeft          ( AVLnode<T> *a );
-    AVLnode<T>* rotateRight         ( AVLnode<T> *a );
-    AVLnode<T>* rotateLeftThenRight ( AVLnode<T> *n );
-    AVLnode<T>* rotateRightThenLeft ( AVLnode<T> *n );
-    void rebalance                  ( AVLnode<T> *n );
-    int height                      ( AVLnode<T> *n );
-    void setBalance                 ( AVLnode<T> *n );
-    void printBalance               ( AVLnode<T> *n );
-    void clearNode                  ( AVLnode<T> *n );
-    void postorder 					( AVLnode<T> *curr, ofstream* os);
+ 	//Note I use the method name 'brotate' not 'rotate'. This is an odd personal preference.
+    AVLNode<T>* leftBrotate(AVLNode<T>*);
+    AVLNode<T>* rightBrotate(AVLNode<T>*);
+    AVLNode<T>* leftRightBrotate(AVLNode<T>*);
+    AVLNode<T>* rightLeftBrotate(AVLNode<T>*);
+
+    void rebalance(AVLNode<T>*);
+    int heightOfNode(AVLNode<T>*);
+    void calculateBalance(AVLNode<T>*);
+    void postorder(AVLNode<T> *curr, ofstream* os);
 
     int numWords;
 };
  
-/* AVL class definition */
-template <class T>
-void AVLtree<T>::rebalance(AVLnode<T> *n) {
-    setBalance(n);
- 
-    if (n->balance == -2) {
-        if (height(n->left->left) >= height(n->left->right))
-            n = rotateRight(n);
-        else
-            n = rotateLeftThenRight(n);
-    }
-    else if (n->balance == 2) {
-        if (height(n->right->right) >= height(n->right->left))
-            n = rotateLeft(n);
-        else
-            n = rotateRightThenLeft(n);
-    }
- 
-    if (n->parent != NULL) {
-        rebalance(n->parent);
-    }
-    else {
-        root = n;
-    }
-}
- 
-template <class T>
-AVLnode<T>* AVLtree<T>::rotateLeft(AVLnode<T> *a) {
 
-	//cout << "Rotating Left\n";
-
-    AVLnode<T> *b = a->right;
-    b->parent = a->parent;
-    a->right = b->left;
- 
-    if (a->right != NULL)
-        a->right->parent = a;
- 
-    b->left = a;
-    a->parent = b;
- 
-    if (b->parent != NULL) {
-        if (b->parent->right == a) {
-            b->parent->right = b;
-        }
-        else {
-            b->parent->left = b;
-        }
-    }
- 
-    setBalance(a);
-    setBalance(b);
-    return b;
-}
- 
+//Default constructor, nothing exciting
 template <class T>
-AVLnode<T>* AVLtree<T>::rotateRight(AVLnode<T> *a) {
-
-	//cout << "Rotating Right\n";
-
-    AVLnode<T> *b = a->left;
-    b->parent = a->parent;
-    a->left = b->right;
- 
-    if (a->left != NULL)
-        a->left->parent = a;
- 
-    b->right = a;
-    a->parent = b;
- 
-    if (b->parent != NULL) {
-        if (b->parent->right == a) {
-            b->parent->right = b;
-        }
-        else {
-            b->parent->left = b;
-        }
-    }
- 
-    setBalance(a);
-    setBalance(b);
-    return b;
-}
- 
-template <class T>
-AVLnode<T>* AVLtree<T>::rotateLeftThenRight(AVLnode<T> *n) {
-
-	//cout << "Rotating Left-Right\n";
-
-    n->left = rotateLeft(n->left);
-    return rotateRight(n);
-}
- 
-template <class T>
-AVLnode<T>* AVLtree<T>::rotateRightThenLeft(AVLnode<T> *n) {
-
-	//cout << "Rotating Right-Left\n";
-
-    n->right = rotateRight(n->right);
-    return rotateLeft(n);
-}
- 
-template <class T>
-int AVLtree<T>::height(AVLnode<T> *n) {
-    if (n == NULL)
-        return -1;
-    return 1 + std::max(height(n->left), height(n->right));
-}
- 
-template <class T>
-void AVLtree<T>::setBalance(AVLnode<T> *n) {
-    n->balance = height(n->right) - height(n->left);
-}
- 
-template <class T>
-void AVLtree<T>::printBalance(AVLnode<T> *n) {
-    if (n != NULL) {
-        printBalance(n->left);
-        std::cout << n->balance << " ";
-        printBalance(n->right);
-    }
-}
- 
-template <class T>
-AVLtree<T>::AVLtree(void) : root(NULL) {
+AVLTree<T>::AVLTree(void){
+	root = nullptr;
 	numWords = 0;
 }
- 
+
+//Destructor, deletes root, which will recursively delete it's children (see ~AVLNode())
 template <class T>
-AVLtree<T>::~AVLtree(void) {
+AVLTree<T>::~AVLTree(void) {
     delete root;
 }
  
+/*
+Performs a left brotation at node 'curr', and returns the new root of the subtree after rotation
+@param curr - the node at which to perform the brotation
+@return - the new root of the subtree which got brotated
+*/
 template <class T>
-AVLnode<T>* AVLtree<T>::insert(T key) {
-    if (root == NULL) {
-        root = new AVLnode<T>(key, NULL);
+AVLNode<T>* AVLTree<T>::leftBrotate(AVLNode<T> *curr) {
+
+	//cout << "Rotating Left\n";
+
+	//Save right child to temp
+    AVLNode<T> *temp = curr->rightChild;
+
+    //Make temp new root of subtree
+    temp->parent = curr->parent;
+
+    //Make curr's right child temp's left child
+    curr->rightChild = temp->leftChild;
+ 
+ 	//If temp's right child wasn't null, save it's new parent
+    if (curr->rightChild != nullptr)
+        curr->rightChild->parent = curr;
+ 
+ 	//Make curr temp's left child and save the parent relationship in curr
+    temp->leftChild = curr;
+    curr->parent = temp;
+ 
+ 	//If temp isn't the root
+    if (temp->parent != nullptr) {
+
+    	//Fix the new subtree's parent's pointers
+        if (temp->parent->rightChild == curr) {
+            temp->parent->rightChild = temp;
+        }
+        else {
+            temp->parent->leftChild = temp;
+        }
+    }
+ 	
+ 	//Calculate the new balances and return the new root of the subtree
+    calculateBalance(curr);
+    calculateBalance(temp);
+    return temp;
+}
+ 
+ /*
+Performs a right brotation at node 'curr', and returns the new root of the subtree after rotation
+@param curr - the node at which to perform the brotation
+@return - the new root of the subtree which got brotated
+ */
+template <class T>
+AVLNode<T>* AVLTree<T>::rightBrotate(AVLNode<T> *curr) {
+
+	//cout << "Rotating Right\n";
+
+	//Save left child to temp
+    AVLNode<T> *temp = curr->leftChild;
+
+    //Make temp new root of subtree
+    temp->parent = curr->parent;
+
+    //Make curr's right child temp's left child
+    curr->leftChild = temp->rightChild;
+ 
+ 	//If temp's left child wasn't null, save it's new parent
+    if (curr->leftChild != nullptr)
+        curr->leftChild->parent = curr;
+ 
+
+    temp->rightChild = curr;
+    curr->parent = temp;
+ 	
+ 	//If temp isn't the root
+    if (temp->parent != nullptr) {
+
+    	//Fix the new subtree's parent's pointers
+        if (temp->parent->rightChild == curr) {
+            temp->parent->rightChild = temp;
+        }
+        else {
+            temp->parent->leftChild = temp;
+        }
+    }
+ 
+ 	//Calculate the new balances and return the new root of the subtree
+    calculateBalance(curr);
+    calculateBalance(temp);
+    return temp;
+}
+ 
+/*
+Performs a left-right brotation at node 'curr', and returns the new root of the subtree after rotation
+@param curr - the node at which to perform the brotation
+@return - the new root of the subtree which got brotated
+ */
+template <class T>
+AVLNode<T>* AVLTree<T>::leftRightBrotate(AVLNode<T> *curr) {
+
+	//cout << "Rotating Left-Right\n";
+
+    curr->leftChild = leftBrotate(curr->leftChild);
+    return rightBrotate(curr);
+}
+ 
+/*
+Performs a right-left brotation at node 'curr', and returns the new root of the subtree after rotation
+@param curr - the node at which to perform the brotation
+@return - the new root of the subtree which got brotated
+ */
+template <class T>
+AVLNode<T>* AVLTree<T>::rightLeftBrotate(AVLNode<T> *curr) {
+
+	//cout << "Rotating Right-Left\n";
+
+    curr->rightChild = rightBrotate(curr->rightChild);
+    return leftBrotate(curr);
+}
+ 
+/*
+Recursivelly calculates the height of node curr by descending down the tree
+@param curr - the node to calculate the height of
+@return - the height of the node, where leaves are height 0
+*/
+template <class T>
+int AVLTree<T>::heightOfNode(AVLNode<T> *curr) {
+
+	//base case!
+    if (curr == nullptr)
+        return -1;
+
+    //Recursively find max of left and right subtrees
+    return 1 + std::max(heightOfNode(curr->leftChild), heightOfNode(curr->rightChild));
+}
+
+/*
+Calculate and saves the balance of node curr by calculating the difference between the heights of its children
+@param curr - the node whose balance needs to be calculated and saved
+*/
+template <class T>
+void AVLTree<T>::calculateBalance(AVLNode<T> *curr) {
+    curr->balance = heightOfNode(curr->rightChild) - heightOfNode(curr->leftChild);
+}
+ 
+template <class T>
+void AVLTree<T>::rebalance(AVLNode<T> *curr) {
+
+	//calculate the balance for this current node
+    calculateBalance(curr);
+ 
+ 	//Left case
+    if (curr->balance == -2) {
+
+    	//Left left case
+        if (heightOfNode(curr->leftChild->leftChild) >= heightOfNode(curr->leftChild->rightChild))
+            curr = rightBrotate(curr);
+       
+        //Left right case
+        else
+            curr = leftRightBrotate(curr);
+    
+    }
+
+    //Right case
+    else if (curr->balance == 2) {
+
+    	//Right right case
+        if (heightOfNode(curr->rightChild->rightChild) >= heightOfNode(curr->rightChild->leftChild))
+            curr = leftBrotate(curr);
+        
+        //Right left case
+        else
+            curr = rightLeftBrotate(curr);
+    }
+ 
+ 	//If root hasn't been found
+    if (curr->parent != nullptr) {
+    	//Recursively call up the tree
+        rebalance(curr->parent);
+    }
+    else {
+    	//Set the new root (if it's been changed)
+        root = curr;
+    }
+}
+ 
+template <class T>
+AVLNode<T>* AVLTree<T>::insert(T key) {
+    if (root == nullptr) {
+        root = new AVLNode<T>(key, nullptr);
         return root;
     }
     else {
-        AVLnode<T>
+        AVLNode<T>
             *n = root,
             *parent;
  
@@ -209,18 +303,18 @@ AVLnode<T>* AVLtree<T>::insert(T key) {
             parent = n;
  
             bool goLeft = n->key > key;
-            n = goLeft ? n->left : n->right;
+            n = goLeft ? n->leftChild : n->rightChild;
 
-            AVLnode<T>* toReturn;
+            AVLNode<T>* toReturn;
  
-            if (n == NULL) {
+            if (n == nullptr) {
                 if (goLeft) {
-                    parent->left = new AVLnode<T>(key, parent);
-                    toReturn = parent->left;
+                    parent->leftChild = new AVLNode<T>(key, parent);
+                    toReturn = parent->leftChild;
                 }
                 else {
-                    parent->right = new AVLnode<T>(key, parent);
-                    toReturn = parent->right;
+                    parent->rightChild = new AVLNode<T>(key, parent);
+                    toReturn = parent->rightChild;
                 }
  
                 rebalance(parent);
@@ -232,56 +326,10 @@ AVLnode<T>* AVLtree<T>::insert(T key) {
  
     return nullptr;
 }
- 
-template <class T>
-void AVLtree<T>::deleteKey(const T delKey) {
-    if (root == NULL)
-        return;
- 
-    AVLnode<T>
-        *n       = root,
-        *parent  = root,
-        *delNode = NULL,
-        *child   = root;
- 
-    while (child != NULL) {
-        parent = n;
-        n = child;
-        child = delKey >= n->key ? n->right : n->left;
-        if (delKey == n->key)
-            delNode = n;
-    }
- 
-    if (delNode != NULL) {
-        delNode->key = n->key;
- 
-        child = n->left != NULL ? n->left : n->right;
- 
-        if (root->key == delKey) {
-            root = child;
-        }
-        else {
-            if (parent->left == n) {
-                parent->left = child;
-            }
-            else {
-                parent->right = child;
-            }
- 
-            rebalance(parent);
-        }
-    }
-}
- 
-template <class T>
-void AVLtree<T>::printBalance() {
-    printBalance(root);
-    std::cout << std::endl;
-}
 
 template <class T>
-vector<int> AVLtree<T>::getDocsForWord(string word){
-	AVLnode<T>* node = search(word);
+vector<int> AVLTree<T>::getDocsForWord(string word){
+	AVLNode<T>* node = search(word);
 	vector<int> docs;
 	if(node != nullptr){
 		docs = node->docs;
@@ -290,15 +338,15 @@ vector<int> AVLtree<T>::getDocsForWord(string word){
 }
 
 template <class T>
-void AVLtree<T>::addDocToWord(string word, int docIndex){
-	AVLnode<T>* node = search(word);
+void AVLTree<T>::addDocToWord(string word, int docIndex){
+	AVLNode<T>* node = search(word);
 
 	if(node != nullptr){
 
 		node->docs.push_back(docIndex);
 	} else {
 
-		AVLnode<T>* newNode = insert(word);
+		AVLNode<T>* newNode = insert(word);
 
 		vector<int> docs;
 		docs.push_back(docIndex);
@@ -307,19 +355,19 @@ void AVLtree<T>::addDocToWord(string word, int docIndex){
 }
 
 template <class T>
-AVLnode<T>* AVLtree<T>::search(string word){
-	AVLnode<T>* curr = root;
+AVLNode<T>* AVLTree<T>::search(string word){
+	AVLNode<T>* curr = root;
 	while(curr != nullptr && curr->key != word){
 		if(curr->key > word){
-			if(curr->left != nullptr){
-				curr = curr->left;
+			if(curr->leftChild != nullptr){
+				curr = curr->leftChild;
 				continue;
 			} else {
 				return nullptr;
 			}
 		} else if(curr->key < word){
-			if(curr->right != nullptr){
-				curr = curr->right;
+			if(curr->rightChild != nullptr){
+				curr = curr->rightChild;
 				continue;
 			} else {
 				return nullptr;
@@ -330,20 +378,20 @@ AVLnode<T>* AVLtree<T>::search(string word){
 }
 
 template<class T>
-int AVLtree<T>::getNumWords(){
+int AVLTree<T>::getNumWords(){
 	return numWords;
 }
 
 template<class T>
-void AVLtree<T>::postorderFileWrite(ofstream* os){
+void AVLTree<T>::postorderFileWrite(ofstream* os){
 	postorder(root, os);
 }
 
 template<class T>
-void AVLtree<T>::postorder(AVLnode<T>* curr, ofstream* os){
+void AVLTree<T>::postorder(AVLNode<T>* curr, ofstream* os){
 	if(curr == nullptr) return;
-	postorder(curr->left, os);
-	postorder(curr->right, os);
+	postorder(curr->leftChild, os);
+	postorder(curr->rightChild, os);
 
 	*os << curr->key;
 	for(int i = 0; i < curr->docs.size(); i++){

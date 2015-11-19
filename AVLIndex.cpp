@@ -211,7 +211,7 @@ bool AVLIndex::readFromFile(string fileName){
 			string num;
 			is >> num;
 			if(num == "<3>"){
-				AVLnode<string>* newNode = index.insert(name);
+				AVLNode<string>* newNode = index.insert(name);
 				newNode->docs = nums;
 				break;
 			} else {

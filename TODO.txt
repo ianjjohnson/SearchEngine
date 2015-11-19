@@ -4,8 +4,6 @@ Top 50 frequently indexed words
 
 Relevancy stat output
 
-Commenting!
-
 Loading bar?
 
 AVL-Fixifying
