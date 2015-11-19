@@ -2,7 +2,6 @@ TODO:
 
 Top 50 frequently indexed words
 
-Author names and dates saved and output
 Relevancy stat output
 
 Commenting!

@@ -46,7 +46,12 @@ int main(int argc, char* argv[])
    				"(6): Print Stats\n" <<
    				"(7): Save the index to a file\n"
    				"(8): Exit \n";
-   		cin >> selection;
+   		if(!(cin >> selection)){
+   			cout << "Invalid input. Please try again.\n";
+   			cin.clear();
+			cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+   			continue;
+   		}
    		switch(selection){
    			case 1 : 
    				cout << "(1): HashTable\n(2): AVL Tree\n";
@@ -102,6 +107,8 @@ int main(int argc, char* argv[])
    			case 8 :
    				exit = true;
    				break;
+   			default : 
+   				cout << "Invalid input. Please try again.\n";
    		}
    		if(exit) break;
    }

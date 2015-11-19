@@ -52,10 +52,7 @@ bool XMLParser::isStopWord(string token){
 
 
    //For every stop word, check if it's a match
-   for(int i = 0; i < stopWords.size(); i++){
-      if(token == stopWords.at(i)) return true;
-   }
-   return false;
+   return binary_search(stopWords.begin(), stopWords.end(), token);
 }
 
 /*
@@ -171,12 +168,13 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
          	titleStream >> word;
          	writeDocFile << word << " ";
 
-            //if(/*!isStopWord(word) */!isXMLTag(word)){
+            if(!isStopWord(word) && !isXMLTag(word)){
 				word[0] = tolower(word[0]);
             	Porter2Stemmer::stem(word);
 
 
             	index->addWordForDocument(indexOfDoc, word);
+            }
           }
 
          //Make a stringstream of the text element of the document node
