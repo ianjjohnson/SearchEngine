@@ -10,15 +10,19 @@
 
 using namespace std;
 
+/*
+Public interface method for query handling
+@param query - the list of strings in the user's query input (includes AND, OR, NOT)
+@param indInput - a pointer to the index to search
+*/
 void QueryHandler::handleQuery(vector<string> query,  IndexInterface* indInput){
 	ind = indInput;
 	doSearch(query);
 }
 
 /*
-Searches the index for a series of search queries in argv
-@param argc - the number of command line args
-@param argv - the list of 
+Searches the index for a series of words in 'words'
+@param words - the list of words input by the user in the query (includes AND, OR, NOT)
 */
 void QueryHandler::doSearch(vector<string> words){
 

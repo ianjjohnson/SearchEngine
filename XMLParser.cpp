@@ -4,6 +4,10 @@
 #include <sstream>
 #include <algorithm>
 
+/*
+Constructor for the XML parser, loads the stopwords
+@param fileName - the name of the xml parser to be parsed
+*/
 XMLParser::XMLParser(string fileName){
 	is.open(fileName);
 
@@ -18,6 +22,12 @@ XMLParser::XMLParser(string fileName){
 	}
 }
 
+/*
+Checks if a specific token is XML junk by seing if it contains 
+any of the following characters
+@param token - the string to be checked for garbage
+@return - true if the token contains xml crap
+*/
 bool XMLParser::isXMLTag(string token){
    return token.find("<") != string::npos
       || token.find(">") != string::npos
@@ -51,7 +61,7 @@ bool XMLParser::isStopWord(string token){
    }
 
 
-   //For every stop word, check if it's a match
+   //Look for the word in the stopwords list using a binary search
    return binary_search(stopWords.begin(), stopWords.end(), token);
 }
 
@@ -80,14 +90,14 @@ bool XMLParser::readFile(IndexInterface* index){
 /*
 Skips one page of the current xmlfile
 @return - true if the method succeeded
-*/
+
 bool XMLParser::skipIntroPage(){
 
 	string token = "";
 	while(token != "<page>") is >> token;
 
 	return true;
-}
+}*/
 
 /*
 Reads a file called fileName into an IndexInterface using rapidxml
@@ -125,6 +135,7 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
       //Ignore documents called user or file. They're garbage
       if(docName.substr(0, 4) == "User" || docName.substr(0,4) == "File") continue;
 
+      //Find and save the author of the last revision
       string docAuthor;
       if(document_node->first_node("revision")->first_node("contributor") != nullptr
       	&& document_node->first_node("revision")->first_node("contributor")->first_node("username") != nullptr)
@@ -132,6 +143,7 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
       else
       	docAuthor = "No author information given";
 
+      //Find and save the timestamp for the last revision
       string timestamp;
       if(document_node->first_node("revision")->first_node("timestamp") != nullptr)
       	timestamp = document_node->first_node("revision")->first_node("timestamp")->value();
@@ -153,7 +165,7 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
       if(text){
 
 
-
+      	//Calculate file name for document file
       	 docNameCopy = docName;
       	 replace(docNameCopy.begin(), docNameCopy.end(), '/', ' ');
       	 replace(docNameCopy.begin(), docNameCopy.end(), ':', '.');
@@ -168,11 +180,12 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
          	titleStream >> word;
          	writeDocFile << word << " ";
 
+         	//Check if the word is a stop word or xml garbage
             if(!isStopWord(word) && !isXMLTag(word)){
+				
+				//If not, remove capitalization, stem it, and index it
 				word[0] = tolower(word[0]);
             	Porter2Stemmer::stem(word);
-
-
             	index->addWordForDocument(indexOfDoc, word);
             }
           }
@@ -187,7 +200,11 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
          	string word;
          	ss >> word;
          	writeDocFile << word << " ";
+
+         	//Check if the word is a stop word or xml garbage
             if(!isStopWord(word) && !isXMLTag(word)){
+
+            	//If not, remove capitalization, stem it, and index it
 				word[0] = tolower(word[0]);
             	Porter2Stemmer::stem(word);
             	index->addWordForDocument(indexOfDoc, word);           	
@@ -197,7 +214,7 @@ bool XMLParser::readFileToIndex(string fileName, IndexInterface* index){
 
        }
 
-
+       //close ofstream for this doc
        writeDocFile.close();
        cout << num++ << docName << endl;
 	}

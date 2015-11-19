@@ -6,8 +6,17 @@ Relevancy stat output
 
 Commenting!
 
+Loading bar?
+
 AVL-Fixifying
+
+
+Paper
+User Manual
+Docs
+
+
 
 Indexing speed improvements:
 	Hashmap Porter stemmer save stemmed words
-	Check stopwords with hashtable or binary search
+	Check stopwords with hashtable? (currently binary search)

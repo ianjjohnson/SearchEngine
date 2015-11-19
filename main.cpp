@@ -10,26 +10,22 @@
 
 using namespace std;
 
-void doSearch(int, char**);
-
-
-
 IndexInterface* ind;
 QueryHandler query;
 
 int main(int argc, char* argv[])
 {
 
+	//Build the parser using default xml file
    XMLParser parser("Input.xml");
-  	//parser.readFileToIndex("Input.xml", &ind);
 
-   /*LinearIndex ind;
 
-   XMLParser parser("Input.xml");
-   parser.readFile(&ind);
 
-   ind.print();*/
-
+   /*
+   The following is a switch-statement based UI which allows the user to
+   type in a number to indicate which function he would like to call.
+   Its lower-level functionality is considered to be self-evident
+   */
    int selection = 0;
    int typeSelection = 0;
    string fileName;

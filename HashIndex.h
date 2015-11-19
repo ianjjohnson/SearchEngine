@@ -16,7 +16,7 @@ public:
 
 	virtual vector<string> getDocumentsForWord(string word);
 
-	virtual bool sortComparator(int, int, vector<string>);
+	//virtual bool sortComparator(int, int, vector<string>);
 
 	virtual bool writeToFile(string);
 	virtual bool readFromFile(string);

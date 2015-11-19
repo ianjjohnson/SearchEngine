@@ -6,7 +6,7 @@
 #include <map>
 
 HashIndex::~HashIndex() {
-
+	//std::unordered_map deals with its own memory, yo'
 }
 
 /*
@@ -43,12 +43,16 @@ Adds a word to be indexed for a specific document
 @param word - the word to be added to the index for this document
 */
 bool HashIndex::addWordForDocument(int documentIndex, string word){
+		//Search for this word in the index
 		unordered_map< string, vector< int > >::iterator item = index.find(word);
 
+		//Register that the number of words in this document has increased
 		documentTitles.at(documentIndex).second = documentTitles.at(documentIndex).second +1;
+		
 		//If this word hasn't been indexed yet
 		if(item == index.end()){
 
+			//Build a new object for this word and put it in the index
 			vector< int > nums;
 			nums.push_back(documentIndex);
 			pair< string, vector<int> > newItem (word, nums);
@@ -57,6 +61,7 @@ bool HashIndex::addWordForDocument(int documentIndex, string word){
 		} 
 		//If this word has already been indexed
 		else {
+			//Add this document index to the word's index list
 			item->second.push_back(documentIndex);
 		}
 
@@ -66,7 +71,7 @@ bool HashIndex::addWordForDocument(int documentIndex, string word){
 /*
 A comparator for sorting two items to be output.
 @param first - the index of the first document 
-*/
+
 bool HashIndex::sortComparator(int first, int second, vector<string> wordsInSearchQuery){
 	int numMatches1 = 0;
 	int numMatches2 = 0;
@@ -76,8 +81,13 @@ bool HashIndex::sortComparator(int first, int second, vector<string> wordsInSear
 		numMatches2 += count(item->second.begin(), item->second.end(), second);
 	}
 	return numMatches1/documentTitles.at(first).second < numMatches2/documentTitles.at(second).second;
-}
+}*/
 
+/*
+Gets all of the documents which contain word, and returns them in a vector ordered by relevance
+@param word - the word to search for
+@return - a list of documents containing that word, ranked by TF/IDF
+*/
 vector<string> HashIndex::getDocumentsForWord(string word){
 
 	Porter2Stemmer::stem(word);
@@ -231,6 +241,11 @@ void HashIndex::print(){
 	}
 }
 
+/*
+Writes the index to a file
+@param fileName - the file to write to
+@return - true if successful
+*/
 bool HashIndex::writeToFile(string fileName){
 	ofstream os(fileName);
 	for(int i = 0; i < documentTitles.size(); i++){
@@ -253,6 +268,11 @@ bool HashIndex::writeToFile(string fileName){
 	return true;
 }
 
+/*
+Reads the index from a file
+@param fileName - the file to read from
+@return - true if successful
+*/
 bool HashIndex::readFromFile(string fileName){
 	ifstream is(fileName);
 	string token;
@@ -332,6 +352,12 @@ bool HashIndex::readFromFile(string fileName){
 	return true;
 }
 
+/*
+Gets the author and timestamp for a document by title
+@param name - the name of the document to find info for
+@return.first - the author of the document's last revision
+@return.second - the timestamp of the document's last revision
+*/
 pair<string, string> HashIndex::getAuthorAndTimeForDocNamed(string name){
 	map<string, pair<string, string> >::iterator authorTime = authorsAndDates.find(name);
 	return authorTime->second;

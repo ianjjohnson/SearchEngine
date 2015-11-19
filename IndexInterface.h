@@ -7,6 +7,7 @@
 
 using namespace std;
 
+//Virtual class used as an interface for the AVL and Hashtable index classes
 class IndexInterface{
 public:
 	virtual ~IndexInterface() {}
@@ -16,7 +17,7 @@ public:
 
 	virtual vector<string> getDocumentsForWord(string word)= 0;
 
-	virtual bool sortComparator(int, int, vector<string>) = 0;
+	//virtual bool sortComparator(int, int, vector<string>) = 0;
 
 	virtual bool writeToFile(string) = 0;
 	virtual bool readFromFile(string) = 0;
@@ -27,6 +28,8 @@ public:
 	virtual pair<string, string> getAuthorAndTimeForDocNamed(string name) = 0;
 
 private:
+
+	//These two data structures are for saving info about each document, NOT indexing information
 	vector<pair<string, int> > documentTitles;
 	map<string, pair<string, string> > authorsAndDates;
 

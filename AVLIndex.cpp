@@ -75,9 +75,9 @@ vector<string> AVLIndex::getDocumentsForWord(string word){
 
 }
 
-bool AVLIndex::sortComparator(int, int, vector<string>){
+/*bool AVLIndex::sortComparator(int, int, vector<string>){
 	return true;
-}
+}*/
 
 bool AVLIndex::writeToFile(string fileName){
 	ofstream os(fileName);

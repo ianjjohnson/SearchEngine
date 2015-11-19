@@ -10,7 +10,7 @@ class XMLParser{
 public:
 	XMLParser(string);
 	//bool writeDocToIndex(IndexInterface*);
-	bool skipIntroPage();
+	//bool skipIntroPage();
 	//bool readFile(IndexInterface*);
 	bool readFileToIndex(string fileName, IndexInterface* index);
 	bool isXMLTag(string token);
